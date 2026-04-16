@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PARTEXPERT — Cockpit Cabinet</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#1a2f47;--navy2:#2d4a6e;--gold:#c9a84c;--teal:#2a7a72;
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --text:#1a1a1a;--muted:#7a7060;--border:#e8e4db;
+  --green:#3a8a5e;--red:#d95b4a;--orange:#d47e2a;--blue:#3a6ea8;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
+
+/* ── LOGIN ───────────────────────────────────────────────────────────────── */
+#login{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:100;}
+#login::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(201,168,76,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.04) 1px,transparent 1px);background-size:48px 48px;}
+#login::after{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(201,168,76,0.07) 0%,transparent 70%);top:-100px;right:-100px;pointer-events:none;}
+.login-card{background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:20px;padding:48px 44px;width:420px;max-width:94vw;position:relative;z-index:1;backdrop-filter:blur(8px);}
+.login-logo{text-align:center;margin-bottom:32px;}
+.login-mark{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);border-radius:13px;margin-bottom:14px;}
+.login-mark-dot{width:18px;height:18px;background:var(--gold);border-radius:50%;}
+.login-brand{font-family:'Playfair Display',serif;font-size:23px;font-weight:700;color:#fff;}
+.login-tagline{font-size:9px;color:rgba(201,168,76,0.7);letter-spacing:2.5px;text-transform:uppercase;margin-top:4px;}
+.login-hr{height:1px;background:rgba(255,255,255,0.08);margin:24px 0;}
+.login-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#fff;text-align:center;margin-bottom:6px;}
+.login-desc{font-size:12px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:22px;line-height:1.6;}
+.setup-box{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:13px 14px;margin-bottom:18px;}
+.setup-box h4{font-size:11px;color:var(--gold);margin-bottom:6px;}
+.setup-box p{font-size:11px;color:rgba(255,255,255,0.45);line-height:1.55;}
+.setup-box code{font-family:monospace;font-size:10px;background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:3px;color:rgba(201,168,76,0.8);}
+.setup-row{display:flex;gap:6px;margin-top:9px;}
+.setup-input{flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:7px 9px;font-size:11px;font-family:monospace;color:#fff;outline:none;}
+.setup-input:focus{border-color:rgba(201,168,76,0.4);}
+.setup-input::placeholder{color:rgba(255,255,255,0.2);}
+.setup-apply{background:rgba(201,168,76,0.18);border:1px solid rgba(201,168,76,0.28);color:var(--gold);border-radius:6px;padding:7px 11px;font-size:11px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;}
+.setup-apply:hover{background:rgba(201,168,76,0.28);}
+.btn-google-real{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;padding:12px 18px;background:#fff;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:500;color:#1a1a1a;cursor:pointer;transition:all 0.18s;box-shadow:0 2px 10px rgba(0,0,0,0.22);margin-bottom:10px;}
+.btn-google-real:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(0,0,0,0.3);}
+.login-note{font-size:10px;color:rgba(255,255,255,0.28);text-align:center;line-height:1.6;margin-bottom:16px;}
+.login-note strong{color:rgba(201,168,76,0.5);}
+.demo-sep{border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;}
+.demo-lbl{font-size:9px;color:rgba(255,255,255,0.28);text-align:center;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.demo-list{display:flex;flex-direction:column;gap:6px;}
+.demo-btn{display:flex;align-items:center;gap:9px;width:100%;padding:8px 13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.12s;}
+.demo-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(201,168,76,0.25);}
+.demo-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:10px;font-weight:700;flex-shrink:0;}
+.demo-n{font-size:12px;font-weight:500;color:#fff;text-align:left;}
+.demo-r{font-size:10px;color:rgba(255,255,255,0.32);text-align:left;}
+
+/* ── APP SHELL ───────────────────────────────────────────────────────────── */
+.app{display:flex;flex-direction:column;height:100vh;}
+
+/* TOP NAV */
+.topnav{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 22px;flex-shrink:0;}
+.tn-left{display:flex;align-items:center;gap:14px;}
+.tn-brand{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--navy);}
+.tn-brand span{color:var(--gold);}
+.tn-switcher{display:flex;gap:3px;background:var(--surface2);border-radius:8px;padding:3px;border:1px solid var(--border);}
+.sw-btn{padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all 0.13s;font-family:'DM Sans',sans-serif;}
+.sw-btn.active{background:var(--navy);color:#fff;}
+.tn-right{display:flex;align-items:center;gap:10px;}
+.tn-date{font-size:11px;color:var(--muted);}
+.tn-user{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 9px;border-radius:7px;transition:background 0.13s;}
+.tn-user:hover{background:var(--surface2);}
+.tn-photo{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,0.4);}
+.tn-initials{width:28px;height:28px;border-radius:50%;border:2px solid rgba(201,168,76,0.4);background:linear-gradient(135deg,var(--gold),var(--navy2));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:10px;color:#fff;font-weight:700;}
+.tn-uname{font-size:12px;font-weight:500;color:var(--navy);}
+.tn-uemail{font-size:10px;color:var(--muted);}
+.btn-logout{font-size:11px;padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-logout:hover{color:var(--red);border-color:var(--red);}
+
+/* BODY (sidebar + content) */
+.app-body{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:222px;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;}
+.nav{flex:1;padding:10px 0;overflow-y:auto;}
+.nav-sec{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,168,76,0.42);padding:11px 18px 3px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;cursor:pointer;transition:all 0.13s;border-left:3px solid transparent;font-size:12.5px;color:rgba(255,255,255,0.48);}
+.nav-item:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.05);}
+.nav-item.active{color:#fff;background:rgba(201,168,76,0.1);border-left-color:var(--gold);}
+.ni-icon{width:14px;text-align:center;font-size:11px;flex-shrink:0;}
+.ni-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:500;padding:2px 6px;border-radius:10px;}
+.ni-badge.gld{background:rgba(201,168,76,0.2);color:var(--gold);}
+.ni-badge.grn{background:rgba(58,138,94,0.2);color:#7ecba3;}
+.sb-footer{padding:12px 18px;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:8px;}
+.sb-photo{width:27px;height:27px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(201,168,76,0.35);flex-shrink:0;}
+.sb-init{width:27px;height:27px;border-radius:50%;border:1.5px solid rgba(201,168,76,0.35);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:10px;font-weight:700;flex-shrink:0;}
+.sb-name{font-size:11.5px;color:#fff;font-weight:500;}
+.sb-role{font-size:9.5px;color:rgba(255,255,255,0.33);}
+
+/* CONTENT */
+.content-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.page-bar{padding:11px 22px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.page-ttl{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--navy);}
+.page-meta{font-size:11px;color:var(--muted);}
+.content{padding:18px 22px;flex:1;overflow-y:auto;}
+
+/* ── SHARED COMPONENTS ───────────────────────────────────────────────────── */
+.kpi-row{display:grid;gap:10px;margin-bottom:14px;}
+.k4{grid-template-columns:repeat(4,1fr);}
+.k3{grid-template-columns:repeat(3,1fr);}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kc,var(--navy2));}
+.kl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin-bottom:5px;}
+.kv{font-family:'Playfair Display',serif;font-size:25px;font-weight:700;color:var(--navy);line-height:1;}
+.ks{font-size:11px;color:var(--muted);margin-top:3px;}
+.kt{font-size:11px;margin-top:3px;}
+.up{color:var(--green);}.dn{color:var(--red);}.wn{color:var(--orange);}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.g3{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px;}
+.g32{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-bottom:12px;}
+.gx3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+.card:last-child{margin-bottom:0;}
+.ch{padding:11px 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.ct{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--navy);}
+.cm{font-size:10px;color:var(--muted);}
+.cb{padding:12px 15px;}
+
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-size:10px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:8px 13px;text-align:left;background:var(--surface2);}
+.tbl td{padding:9px 13px;border-bottom:1px solid rgba(232,228,219,.5);font-size:12px;vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(244,242,237,.5);}
+
+.av{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'Playfair Display',serif;flex-shrink:0;}
+.badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:5px;white-space:nowrap;display:inline-block;}
+.bok{background:#d1e7dd;color:#0f5132;}.bwn{background:#fff3cd;color:#856404;}.bbd{background:#f8d7da;color:#842029;}
+.bbl{background:#cfe2ff;color:#084298;}.bgr{background:#f1efe8;color:#5f5e5a;}.bgl{background:rgba(201,168,76,.15);color:#7a5020;}
+.btl{background:rgba(42,122,114,.12);color:var(--teal);}
+
+.pw{display:flex;align-items:center;gap:7px;}
+.pb{flex:1;height:4px;background:var(--border);border-radius:3px;overflow:hidden;}
+.pf{height:100%;border-radius:3px;}
+.pp{font-size:11px;font-weight:500;width:30px;text-align:right;}
+
+.al{display:flex;align-items:flex-start;gap:9px;padding:9px 13px;border-bottom:1px solid rgba(232,228,219,.5);}
+.al:last-child{border-bottom:none;}
+.ai{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.at{font-size:12px;font-weight:500;margin-bottom:2px;}
+.as{font-size:11px;color:var(--muted);}
+.atime{font-size:10px;color:var(--muted);white-space:nowrap;}
+
+.mcw{display:flex;align-items:flex-end;gap:5px;height:52px;padding:9px 14px 11px;}
+.bc{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.br{width:100%;border-radius:2px 2px 0 0;}
+.bl{font-size:10px;color:var(--muted);}
+
+.sp{display:flex;align-items:flex-end;gap:2px;height:27px;}
+.sb2{border-radius:2px 2px 0 0;flex:1;min-width:4px;}
+
+/* STACKED */
+.sw{display:flex;height:17px;border-radius:4px;overflow:hidden;gap:1px;}
+.ss{height:100%;cursor:pointer;transition:opacity .13s;}
+.ss:hover{opacity:.7;}
+
+/* KANBAN */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.kcol{background:var(--surface2);border-radius:8px;padding:10px;}
+.kct{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.kcc{background:var(--border);color:var(--muted);font-size:10px;padding:1px 6px;border-radius:10px;}
+.tcard{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 10px;margin-bottom:5px;cursor:pointer;transition:all .13s;}
+.tcard:hover{border-color:var(--gold);}
+.tcard-t{font-size:12px;font-weight:500;margin-bottom:5px;line-height:1.35;}
+.tcard-m{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.tprio{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.tdue{font-size:10px;color:var(--muted);}
+
+/* DOC GRID */
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.di{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .13s;}
+.di:hover{border-color:var(--gold);}
+.di-icon{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:7px;}
+.di-name{font-size:12px;font-weight:500;margin-bottom:3px;color:var(--navy);}
+.di-meta{font-size:10px;color:var(--muted);}
+
+/* CALENDRIER */
+.cal-h{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;}
+.cal-dn{text-align:center;font-size:10px;color:var(--muted);font-weight:500;padding:3px 0;}
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cd{height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;transition:background .1s;}
+.cd:hover{background:var(--surface2);}
+.cd.today{background:var(--navy);color:#fff;font-weight:600;}
+.cd.cap{background:rgba(201,168,76,.18);color:#7a5020;}
+.cd.ccm{background:rgba(58,138,94,.13);color:var(--green);}
+.cd.clm{background:rgba(58,106,168,.13);color:var(--blue);}
+.cd.csb{background:rgba(212,126,42,.13);color:var(--orange);}
+.cd.oth{opacity:.3;}
+.cd.we{background:rgba(241,239,232,.7);}
+
+/* FORMATION CARD */
+.fc{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px;margin-bottom:9px;display:flex;align-items:flex-start;gap:11px;}
+.fi{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.fn{font-size:12.5px;font-weight:500;margin-bottom:3px;}
+.fs{font-size:11px;color:var(--muted);}
+.ff{display:flex;align-items:center;gap:7px;margin-top:7px;flex-wrap:wrap;}
+
+/* OBJECTIF */
+.oc{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:13px;margin-bottom:9px;}
+.oh{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.oi{display:flex;align-items:center;gap:9px;margin-bottom:7px;}
+.oi:last-child{margin-bottom:0;}
+.ol{font-size:12px;flex:1;}
+.otg{font-size:11px;color:var(--muted);width:90px;text-align:right;flex-shrink:0;}
+
+/* WELCOME CARD */
+.wc{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);border-radius:12px;padding:20px 22px;margin-bottom:14px;display:flex;align-items:center;gap:14px;}
+.wt h2{font-family:'Playfair Display',serif;font-size:17px;color:#fff;margin-bottom:4px;}
+.wt p{font-size:12px;color:rgba(255,255,255,.52);line-height:1.55;}
+.wtime{font-size:11px;color:rgba(201,168,76,.7);margin-top:5px;}
+
+/* BUTTONS */
+.btn{font-size:11px;padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .13s;}
+.btn:hover{background:var(--surface2);color:var(--text);}
+.btn-p{background:var(--navy);color:#fff;border-color:var(--navy);}
+.btn-p:hover{background:var(--navy2);}
+.btn-g2{background:rgba(201,168,76,.1);color:#7a5020;border-color:var(--gold);}
+.btn-g2:hover{background:var(--gold);color:#fff;}
+.btn-ok{background:rgba(58,138,94,.1);color:var(--green);border-color:var(--green);}
+.btn-ok:hover{background:var(--green);color:#fff;}
+.btn-no{background:rgba(217,91,74,.1);color:var(--red);border-color:var(--red);}
+.btn-no:hover{background:var(--red);color:#fff;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(26,47,71,.55);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .18s;}
+.overlay.show{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:12px;width:500px;max-width:96vw;overflow:hidden;transform:translateY(12px);transition:transform .2s;}
+.overlay.show .modal{transform:translateY(0);}
+.mh{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.mt{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:var(--navy);}
+.mc{cursor:pointer;font-size:18px;color:var(--muted);border:none;background:none;}
+.mb{padding:15px 18px;}
+.field{margin-bottom:11px;}
+.field label{font-size:10px;font-weight:500;color:var(--muted);letter-spacing:.5px;display:block;margin-bottom:4px;text-transform:uppercase;}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--surface2);color:var(--text);outline:none;}
+.field textarea{height:85px;resize:vertical;line-height:1.5;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--navy2);}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.mf{padding:11px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:7px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--navy);color:#fff;padding:10px 15px;border-radius:8px;font-size:12px;z-index:999;border-left:3px solid var(--gold);opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* ACCESS DENIED */
+.access-denied{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;}
+.access-denied .adi{font-size:44px;margin-bottom:14px;}
+.access-denied h3{font-family:'Playfair Display',serif;font-size:18px;color:var(--navy);margin-bottom:8px;}
+.access-denied p{font-size:13px;color:var(--muted);line-height:1.6;max-width:360px;}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:14px;}
+.tab{padding:6px 14px;border-radius:7px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .13s;font-family:'DM Sans',sans-serif;}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tab:hover:not(.active){background:var(--surface2);}
+
+.client-sel{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:13px;}
+.cpill{padding:4px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .13s;font-family:'DM Sans',sans-serif;}
+.cpill.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:13px;}
+.lg-i{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+.lg-d{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+.fade-in{animation:fadeUp .2s ease forwards;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-mark"><div class="login-mark-dot"></div></div>
+      <div class="login-brand">PARTEXPERT</div>
+      <div class="login-tagline">Cockpit Cabinet</div>
+    </div>
+    <div class="login-title">Qui êtes-vous ?</div>
+    <div class="login-desc">Sélectionnez votre profil pour accéder au cockpit.</div>
+    <div class="demo-list">
+      <button class="demo-btn" onclick="demoLogin('AP','Adrien Paris','Expert-Comptable','#c9a84c',true)"><div class="demo-av" style="background:rgba(201,168,76,.2);color:#c9a84c">AP</div><div><div class="demo-n">Adrien Paris</div><div class="demo-r">Expert-Comptable · Administrateur</div></div></button>
+      <button class="demo-btn" onclick="demoLogin('BV','Bruno Venticello','Collaborateur Comptable','#2d4a6e',false)"><div class="demo-av" style="background:rgba(45,74,110,.2);color:#2d4a6e">BV</div><div><div class="demo-n">Bruno Venticello</div><div class="demo-r">Collaborateur Comptable</div></div></button>
+      <button class="demo-btn" onclick="demoLogin('JM','Jade Marot','Apprentie Comptable','#3a8a5e',false)"><div class="demo-av" style="background:rgba(58,138,94,.2);color:#3a8a5e">JM</div><div><div class="demo-n">Jade Marot</div><div class="demo-r">Apprentie Comptable</div></div></button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app" style="display:none">
+  <div class="topnav">
+    <div class="tn-left">
+      <div class="tn-brand">PART<span>EXPERT</span></div>
+      <div class="tn-switcher">
+        <button class="sw-btn active" id="sw-prod" onclick="setMode('production')">Production</button>
+        <button class="sw-btn" id="sw-int" onclick="setMode('interne')">Interne cabinet</button>
+      </div>
+    </div>
+    <div class="tn-right">
+      <div class="tn-date" id="tn-date"></div>
+      <a href="https://app.partexpert.fr" target="_blank" style="font-size:11px;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--navy2);text-decoration:none;font-family:'DM Sans',sans-serif;font-weight:500;display:flex;align-items:center;gap:5px;transition:all .13s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--navy)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--navy2)'">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h3.5v1.5H3.5v5h5V7H10v3.5H2V2z" fill="currentColor"/><path d="M6.5 2H10v3.5H8.5V4.56L5.03 8.03 3.97 6.97 7.44 3.5H6.5V2z" fill="currentColor"/></svg>
+        MyUnisoft
+      </a>
+      <div class="tn-user">
+        <div id="tn-photo"></div>
+        <div><div class="tn-uname" id="tn-name"></div><div class="tn-uemail" id="tn-email"></div></div>
+      </div>
+      <button class="btn-logout" style="color:var(--muted)" onclick="openMYUConfig()" title="Configuration MyUnisoft" id="myu-btn">⚙ API</button>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <nav class="nav" id="sidebar-nav"></nav>
+      <div class="sb-footer" id="sb-footer"></div>
+    </div>
+    <div class="content-wrap">
+      <div class="page-bar">
+        <div class="page-ttl" id="pg-title">Tableau de bord</div>
+        <div class="page-meta" id="pg-meta">Avril 2026 · Données simulées</div>
+      </div>
+      <div class="content fade-in" id="content"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"><div class="modal" id="modal-body"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════
+const MOIS=['Sep','Oct','Nov','Déc','Jan','Fév','Mar'];
+const ALLOWED_DOMAINS=['partexpert.fr'];
+const TEAM=[
+  {i:'AP',n:'Adrien Paris',r:'Expert-Comptable',c:'#c9a84c',admin:true,email:'adrien@partexpert.fr',tel:'04 65 84 59 11'},
+  {i:'BV',n:'Bruno Venticello',r:'Collaborateur Comptable',c:'#2d4a6e',admin:false,email:'bruno@partexpert.fr',tel:'04 65 84 59 12'},
+  {i:'JM',n:'Jade Marot',r:'Apprentie Comptable',c:'#3a8a5e',admin:false,email:'jade@partexpert.fr',tel:'04 65 84 59 13'},
+];
+const CLIENTS=[
+  {id:'BEAU',name:'SARL Beaumont',secteur:'Commerce'},
+  {id:'MARC',name:'EI Marchand',secteur:'Services'},
+  {id:'PINE',name:'SCI Les Pins',secteur:'Immobilier'},
+  {id:'LEBL',name:'SARL Leblanc',secteur:'Industrie'},
+  {id:'HORI',name:'SAS Horizon',secteur:'Tech'},
+  {id:'THOM',name:'EURL Thomas',secteur:'Artisan'},
+  {id:'DUPU',name:'SARL Dupuis',secteur:'Commerce'},
+];
+const FIN={
+  BEAU:{treso:[42,38,51,47,55,61,58],ca:[28,31,29,35,38,41,44],ch:[21,23,22,26,27,29,31],cli411:18400,fou401:7200,solde:58000,vr:'+12%',obj:480000,ytd:221},
+  MARC:{treso:[12,9,15,11,18,14,16],ca:[18,16,21,19,24,22,26],ch:[16,15,18,17,20,19,22],cli411:4200,fou401:3100,solde:16000,vr:'-3%',obj:280000,ytd:126},
+  PINE:{treso:[85,82,90,88,95,92,97],ca:[15,15,15,15,15,15,15],ch:[4,4,5,4,4,5,4],cli411:0,fou401:8900,solde:97000,vr:'+5%',obj:180000,ytd:90},
+  LEBL:{treso:[31,28,35,33,29,24,21],ca:[55,51,60,58,52,48,50],ch:[48,46,51,52,47,46,48],cli411:22100,fou401:14300,solde:21000,vr:'-18%',obj:620000,ytd:314},
+  HORI:{treso:[120,135,128,145,152,160,168],ca:[82,88,91,95,104,110,118],ch:[58,62,65,68,72,75,80],cli411:31200,fou401:9800,solde:168000,vr:'+28%',obj:1200000,ytd:598},
+  THOM:{treso:[8,11,9,13,10,14,12],ca:[12,14,11,15,13,16,14],ch:[10,11,10,12,11,12,11],cli411:3800,fou401:2400,solde:12000,vr:'+8%',obj:170000,ytd:83},
+  DUPU:{treso:[65,70,68,75,72,69,66],ca:[44,48,45,52,49,46,44],ch:[35,37,36,40,38,37,36],cli411:12600,fou401:8200,solde:66000,vr:'-4%',obj:540000,ytd:273},
+};
+const ECRITURES=[
+  {d:'SARL Beaumont',ref:'BEAU01',nb:14,age:3,resp:'BV',src:'OCR',email:'contact@beaumont-sarl.fr'},
+  {d:'SCI Les Pins',ref:'PINE01',nb:8,age:1,resp:'JM',src:'Import',email:'scilespins@notaire.fr'},
+  {d:'EI Marchand',ref:'MARC02',nb:23,age:7,resp:'BV',src:'Saisie',email:'j.marchand@gmail.com'},
+  {d:'EURL Thomas',ref:'THOM01',nb:5,age:2,resp:'JM',src:'OCR',email:'p.thomas@gmail.com'},
+  {d:'SAS Horizon',ref:'HORI01',nb:11,age:5,resp:'BV',src:'Import',email:'compta@horizon-sas.fr'},
+  {d:'SARL Leblanc',ref:'LEBL01',nb:3,age:1,resp:'JM',src:'OCR',email:'gestion@leblanc.com'},
+];
+const ATTENTE=[
+  {d:'SARL Beaumont',cpt:'471000',lib:'Virements internes',mt:'4 280,00 €',age:18,email:'contact@beaumont-sarl.fr'},
+  {d:'EI Marchand',cpt:'471000',lib:'Virements internes',mt:'1 050,50 €',age:34,email:'j.marchand@gmail.com'},
+  {d:'SCI Les Pins',cpt:'472000',lib:'Règlements reçus',mt:'8 900,00 €',age:12,email:'scilespins@notaire.fr'},
+  {d:'SARL Leblanc',cpt:'471000',lib:'Virements internes',mt:'620,00 €',age:5,email:'gestion@leblanc.com'},
+  {d:'SAS Horizon',cpt:'473000',lib:'Opérations en attente',mt:'2 340,80 €',age:22,email:'compta@horizon-sas.fr'},
+  {d:'EURL Thomas',cpt:'471000',lib:'Virements internes',mt:'780,00 €',age:9,email:'p.thomas@gmail.com'},
+  {d:'SARL Dupuis',cpt:'472000',lib:'Règlements reçus',mt:'3 120,00 €',age:41,email:'dupuis@dupuis-sa.fr'},
+  {d:'EI Renard',cpt:'471000',lib:'Virements internes',mt:'490,00 €',age:7,email:'renard.ei@orange.fr'},
+];
+const COLLAB=[
+  {i:'AP',dos:48,max:50,pct:96,s:'surcharge'},
+  {i:'BV',dos:62,max:80,pct:78,s:'normal'},
+  {i:'JM',dos:37,max:50,pct:74,s:'normal'},
+];
+const TVA=[
+  {d:'SARL Beaumont',reg:'Mensuel',per:'Fév 2026',s:'validée',mt:'3 240 €'},
+  {d:'SCI Les Pins',reg:'Trimestriel',per:'Q4 2025',s:'validée',mt:'1 890 €'},
+  {d:'EI Marchand',reg:'Mensuel',per:'Fév 2026',s:'en retard',mt:'—',email:'j.marchand@gmail.com'},
+  {d:'SARL Leblanc',reg:'Mensuel',per:'Fév 2026',s:'validée',mt:'5 620 €'},
+  {d:'SAS Horizon',reg:'Trimestriel',per:'Q4 2025',s:'en attente',mt:'—',email:'compta@horizon-sas.fr'},
+  {d:'EURL Thomas',reg:'Mensuel',per:'Fév 2026',s:'validée',mt:'980 €'},
+  {d:'SARL Dupuis',reg:'Mensuel',per:'Fév 2026',s:'en attente',mt:'—',email:'dupuis@dupuis-sa.fr'},
+  {d:'EI Renard',reg:'Trimestriel',per:'Q4 2025',s:'validée',mt:'760 €'},
+];
+const SRC_DEF=[
+  {code:'OCR',label:'OCR',color:'#1a2f47'},{code:'IB',label:'Banque',color:'#2d6a8f'},
+  {code:'E',label:'Saisie',color:'#c9a84c'},{code:'API',label:'API',color:'#3a8a5e'},
+  {code:'EXCEL',label:'Excel',color:'#7b5ea7'},{code:'OD_TVA',label:'OD TVA',color:'#d47e2a'},
+  {code:'ABO',label:'Abonnement',color:'#5b9bd5'},{code:'M',label:'Manuel',color:'#d95b4a'},
+];
+const DOS_SRC=[
+  {name:'SARL Beaumont',v:{OCR:210,IB:185,E:42,API:0,EXCEL:15,OD_TVA:8,ABO:12,M:5}},
+  {name:'EI Marchand',v:{OCR:180,IB:0,E:98,API:0,EXCEL:0,OD_TVA:6,ABO:0,M:22}},
+  {name:'SCI Les Pins',v:{OCR:12,IB:45,E:18,API:0,EXCEL:0,OD_TVA:4,ABO:36,M:2}},
+  {name:'SARL Leblanc',v:{OCR:320,IB:240,E:55,API:85,EXCEL:0,OD_TVA:12,ABO:18,M:8}},
+  {name:'SAS Horizon',v:{OCR:280,IB:195,E:32,API:310,EXCEL:0,OD_TVA:10,ABO:24,M:4}},
+  {name:'EURL Thomas',v:{OCR:65,IB:48,E:38,API:0,EXCEL:12,OD_TVA:4,ABO:0,M:8}},
+  {name:'SARL Dupuis',v:{OCR:195,IB:148,E:62,API:0,EXCEL:22,OD_TVA:8,ABO:14,M:6}},
+];
+const CONGES=[
+  {id:1,qui:'AP',nom:'Adrien Paris',debut:'14/04',fin:'18/04',jours:5,type:'CP',s:'approuvé',note:'Pâques'},
+  {id:2,qui:'BV',nom:'Bruno Venticello',debut:'28/04',fin:'30/04',jours:3,type:'RTT',s:'en attente',note:''},
+  {id:3,qui:'JM',nom:'Jade Marot',debut:'22/04',fin:'23/04',jours:2,type:'CP',s:'en attente',note:'Formation externe'},
+  {id:4,qui:'AP',nom:'Adrien Paris',debut:'14/07',fin:'25/07',jours:10,type:'CP',s:'approuvé',note:'Été'},
+];
+const TACHES=[
+  {id:1,titre:'Mettre à jour le manuel de procédures TVA',a:'BV',p:'haute',e:'10/04',s:'todo',tag:'Procédures'},
+  {id:2,titre:'Préparer la réunion mensuelle équipe',a:'AP',p:'moyenne',e:'08/04',s:'todo',tag:'Réunion'},
+  {id:3,titre:'Révision des tarifs honoraires 2026',a:'AP',p:'haute',e:'15/04',s:'en-cours',tag:'Facturation'},
+  {id:4,titre:'Formation MyUnisoft — nouveaux modules GED',a:'BV',p:'moyenne',e:'22/04',s:'en-cours',tag:'Formation'},
+  {id:5,titre:'Saisie des écritures EI Marchand — mars',a:'JM',p:'haute',e:'07/04',s:'en-cours',tag:'Production'},
+  {id:6,titre:'Archivage dossiers 2024 clôturés',a:'JM',p:'basse',e:'30/04',s:'en-cours',tag:'Archivage'},
+  {id:7,titre:'Renouvellement assurance RC Pro',a:'AP',p:'haute',e:'01/04',s:'fait',tag:'Administratif'},
+  {id:8,titre:'Lettre de mission SARL Beaumont',a:'AP',p:'moyenne',e:'05/04',s:'fait',tag:'Commercial'},
+  {id:9,titre:'Accès MyUnisoft — paramétrage Jade',a:'AP',p:'haute',e:'01/04',s:'bloque',tag:'RH'},
+];
+const DOCS=[
+  {icon:'📋',nom:'Manuel de procédures comptables',cat:'Procédures',mj:'15/03/2026',sz:'2,4 Mo',ac:'Tous'},
+  {icon:'📝',nom:'Guide saisie MyUnisoft v4.2',cat:'Logiciel',mj:'28/02/2026',sz:'1,8 Mo',ac:'Tous'},
+  {icon:'⚖️',nom:'Règlement intérieur cabinet',cat:'RH',mj:'01/01/2026',sz:'340 Ko',ac:'Tous'},
+  {icon:'🔐',nom:'Procédure accès & sécurité SI',cat:'Sécurité',mj:'10/03/2026',sz:'560 Ko',ac:'Admin'},
+  {icon:'📊',nom:'Modèles de lettres de mission',cat:'Commercial',mj:'20/02/2026',sz:'1,1 Mo',ac:'Tous'},
+  {icon:'🎓',nom:'Plan de formation 2026',cat:'Formation',mj:'05/01/2026',sz:'420 Ko',ac:'Admin'},
+  {icon:'📅',nom:'Calendrier fiscal 2026',cat:'Fiscal',mj:'01/01/2026',sz:'180 Ko',ac:'Tous'},
+  {icon:'💼',nom:'Grille tarifaire honoraires',cat:'Commercial',mj:'01/02/2026',sz:'95 Ko',ac:'Admin'},
+  {icon:'🔧',nom:'Procédure démarche qualité',cat:'Qualité',mj:'12/03/2026',sz:'780 Ko',ac:'Tous'},
+];
+const FORMATIONS=[
+  {icon:'🎓',titre:'Réforme facturation électronique 2026',org:'IFCE',date:'15/04/2026',dur:'1j',s:'planifiée',p:['AP','BV','JM'],oblig:true},
+  {icon:'💻',titre:'MyUnisoft — Nouveaux modules GED & Pilotage',org:'MyUnisoft',date:'22/04/2026',dur:'½j',s:'planifiée',p:['BV'],oblig:false},
+  {icon:'📊',titre:'Excel avancé — Tableaux croisés dynamiques',org:'CNED',date:'08/04/2026',dur:'2j',s:'en cours',p:['JM'],oblig:false},
+  {icon:'⚖️',titre:'Actualité fiscale 2026 — IS & TVA',org:'ECF',date:'02/03/2026',dur:'1j',s:'terminée',p:['AP','BV'],oblig:true},
+  {icon:'🔐',titre:'RGPD — Mise à jour pratiques cabinet',org:'CNIL',date:'18/02/2026',dur:'½j',s:'terminée',p:['AP'],oblig:true},
+];
+const OBJECTIFS=[
+  {i:'AP',items:[
+    {l:'Taux d\'automatisation des écritures',act:74,cib:85,u:'%',src:'auto',api:'/mad/entries'},
+    {l:'Déclarations TVA dans les délais',act:63,cib:90,u:'%',src:'auto',api:'/mad/entries'},
+  ]},
+  {i:'BV',items:[
+    {l:'Écritures en attente (draft)',act:37,cib:20,u:'lignes',src:'auto',api:'/mad/entries?draft',inv:true},
+    {l:'Comptes 47x non soldés assignés',act:5,cib:2,u:'lignes',src:'auto',api:'/mad/movements',inv:true},
+  ]},
+  {i:'JM',items:[
+    {l:'Comptes 47x non soldés assignés',act:3,cib:1,u:'lignes',src:'auto',api:'/mad/movements',inv:true},
+    {l:'Écritures en attente (draft)',act:19,cib:10,u:'lignes',src:'auto',api:'/mad/entries?draft',inv:true},
+  ]},
+];
+
+// ═══════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════
+let _user=null, _mode='production', _page='dashboard', _charts={}, _fc='HORI', _ft='treso';
+
+// ═══════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════
+const fmt=n=>new Intl.NumberFormat('fr-FR').format(n);
+const bd=(cls,txt)=>`<span class="badge ${cls}">${txt}</span>`;
+const kp=(c,l,v,s,tr,tc)=>`<div class="kpi" style="--kc:${c}"><div class="kl">${l}</div><div class="kv">${v}</div>${s?`<div class="ks">${s}</div>`:''} ${tr?`<div class="kt ${tc}">${tr}</div>`:''}</div>`;
+const team=(i)=>TEAM.find(t=>t.i===i)||{i,c:'#888',n:i,r:'—'};
+const avEl=(i,sz=27)=>{const m=team(i);return`<div class="av" style="width:${sz}px;height:${sz}px;background:${m.c}22;color:${m.c};font-size:${sz<24?9:10}px">${m.i}</div>`;};
+const spk=(data,color)=>{const mx=Math.max(...data);return data.map(v=>`<div class="sb2" style="height:${Math.round(v/mx*25)}px;background:${color};opacity:.8"></div>`).join('');};
+const rb=(email,sub,body)=>{const e=JSON.stringify(email),s=JSON.stringify(sub),b=JSON.stringify(body);return`<button class="btn btn-g2" onclick="openModal(${e},${s},${b})">Relancer</button>`;};
+const csel=(cur)=>`<div class="client-sel">${CLIENTS.map(c=>`<button class="cpill ${c.id===cur?'active':''}" onclick="selC('${c.id}',this)">${c.name}</button>`).join('')}</div>`;
+function dch(){Object.values(_charts).forEach(c=>{try{c.destroy();}catch(e){}});_charts={};}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function openModal(email,sub,body){
+  document.getElementById('modal-body').innerHTML=`<div class="mh"><div class="mt">Envoyer une relance</div><button class="mc" onclick="closeModal()">✕</button></div><div class="mb"><div class="field"><label>Destinataire</label><input type="email" value="${email||''}"></div><div class="field"><label>Objet</label><input type="text" value="${(sub||'').replace(/'/g,"'")}"></div><div class="field"><label>Message</label><textarea>${(body||'').replace(/'/g,"'")}</textarea></div></div><div class="mf"><button class="btn" onclick="closeModal()">Annuler</button><button class="btn btn-p" onclick="closeModal();toast('✉ Relance envoyée via Gmail')">Envoyer via Gmail</button></div>`;
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal(){document.getElementById('overlay').classList.remove('show');}
+
+// ═══════════════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════════════
+function applyClientId(){
+  const cid=document.getElementById('cid-input').value.trim();
+  if(!cid.includes('.apps.googleusercontent.com')){alert('Format invalide.');return;}
+  document.getElementById('setup-box').style.display='none';
+  localStorage.setItem('pe_cid',cid);
+  google.accounts.id.initialize({client_id:cid,callback:googleCb,auto_select:false});
+  google.accounts.id.renderButton(document.getElementById('gsi-wrap'),{theme:'outline',size:'large',width:340,text:'signin_with',shape:'rectangular'});
+  document.querySelector('.btn-google-real').style.display='none';
+}
+function googleCb(res){
+  const p=JSON.parse(atob(res.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+  const domain=p.email.split('@')[1];
+  if(!ALLOWED_DOMAINS.includes(domain)){alert(`Accès refusé : ${p.email}`);return;}
+  const CABINET_MAP={
+    'adrien@partexpert.fr':{i:'AP',r:'Expert-Comptable',c:'#c9a84c',admin:true},
+    'bruno@partexpert.fr':{i:'BV',r:'Collaborateur Comptable',c:'#2d4a6e',admin:false},
+    'jade@partexpert.fr':{i:'JM',r:'Apprentie Comptable',c:'#3a8a5e',admin:false},
+  };
+  const m=CABINET_MAP[p.email]||{i:(p.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()),r:'Utilisateur',c:'#2d4a6e',admin:false};
+  loginUser({name:p.name,email:p.email,photo:p.picture,initials:m.i,role:m.r,color:m.c,isAdmin:m.admin,source:'google'});
+}
+function toggleDemo(){
+  const d=document.getElementById('demo-panel');
+  d.style.display=d.style.display==='none'?'block':'none';
+}
+function demoLogin(i,n,r,c,adm){
+  const emailMap={'AP':'adrien@partexpert.fr','BV':'bruno@partexpert.fr','JM':'jade@partexpert.fr'};
+  loginUser({name:n,email:emailMap[i]||i.toLowerCase()+'@partexpert.fr',photo:null,initials:i,role:r,color:c,isAdmin:adm,source:'demo'});
+}
+function loginUser(u){
+  _user=u;
+  localStorage.setItem('pe_session',JSON.stringify({...u,t:Date.now()}));
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='flex';
+  // Date
+  document.getElementById('tn-date').textContent=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  // Photo
+  const photoHTML=u.photo?`<img src="${u.photo}" class="tn-photo" referrerpolicy="no-referrer">`:`<div class="tn-initials" style="background:${u.color}22;color:${u.color};border-color:${u.color}44">${u.initials}</div>`;
+  document.getElementById('tn-photo').innerHTML=photoHTML;
+  document.getElementById('tn-name').textContent=u.name;
+  document.getElementById('tn-email').textContent=u.email;
+  // Sidebar footer
+  const sbp=u.photo?`<img src="${u.photo}" class="sb-photo" referrerpolicy="no-referrer">`:`<div class="sb-init" style="background:${u.color}22;color:${u.color};border-color:${u.color}44">${u.initials}</div>`;
+  document.getElementById('sb-footer').innerHTML=`${sbp}<div><div class="sb-name">${u.name.split(' ')[0]+' '+u.name.split(' ').slice(-1)[0]}</div><div class="sb-role">${u.role}</div></div>`;
+  setMode('production');
+}
+function logout(){
+  _user=null;localStorage.removeItem('pe_session');
+  document.getElementById('app').style.display='none';
+  document.getElementById('login').style.display='flex';
+  document.getElementById('demo-panel').style.display='none';
+}
+function checkSession(){
+  const s=localStorage.getItem('pe_session');
+  if(s){try{const u=JSON.parse(s);if(Date.now()-u.t<8*3600*1000){loginUser(u);return;}}catch(e){}}
+  const cid=localStorage.getItem('pe_cid');
+  if(cid){document.getElementById('cid-input').value=cid;applyClientId();}
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════════════
+const NAV_PROD=[
+  {sec:'Tableau de bord'},{id:'dashboard',ic:'◈',lb:'Vue globale'},
+  {sec:'Production'},{id:'collab',ic:'◎',lb:'Collaborateurs'},
+  {id:'ecritures',ic:'✦',lb:'Écritures en attente',badge:'64'},
+  {id:'attente',ic:'◉',lb:"Comptes d'attente",badge:'8'},
+  {id:'sources',ic:'◐',lb:'Origines écritures'},
+  {id:'declarations',ic:'◇',lb:'Déclarations TVA'},
+  {sec:'Finance clients'},{id:'finance',ic:'◆',lb:'Trésorerie & CA'},
+  {id:'balance',ic:'▲',lb:'Balance 411 / 401'},
+  {sec:'Documents'},{id:'ged',ic:'▣',lb:'GED',badge:'3',bc:'gld'},
+  {sec:'Automatisation'},{id:'relances',ic:'✉',lb:'Relances'},
+];
+const NAV_INT=[
+  {sec:"Vue d'ensemble"},{id:'home-int',ic:'◈',lb:'Tableau de bord'},
+  {sec:'RH'},{id:'conges',ic:'◷',lb:'Congés & planning',badge:'2'},
+  {id:'objectifs',ic:'◎',lb:'Objectifs & performances'},
+  {id:'formations',ic:'◆',lb:'Formations',badge:'3',bc:'grn'},
+  {sec:'Organisation'},{id:'taches',ic:'✦',lb:'Tâches (ClickUp)',badge:'5'},
+  {id:'docs',ic:'▣',lb:'Documentation cabinet'},
+  {sec:'Équipe'},{id:'annuaire',ic:'◉',lb:'Annuaire équipe'},
+];
+const TITLES={dashboard:'Vue globale',collab:'Collaborateurs',ecritures:'Écritures en attente',attente:"Comptes d'attente",sources:'Origines des écritures',declarations:'Déclarations TVA',finance:'Trésorerie & CA',balance:'Balance 411 / 401',ged:'GED — Documents',relances:'Relances','home-int':'Tableau de bord',conges:'Congés & planning',objectifs:'Objectifs & performances',formations:'Formations',taches:'Tâches (ClickUp)',docs:'Documentation cabinet',annuaire:'Annuaire équipe'};
+
+function setMode(mode){
+  _mode=mode;
+  document.getElementById('sw-prod').classList.toggle('active',mode==='production');
+  document.getElementById('sw-int').classList.toggle('active',mode==='interne');
+  const nav=mode==='production'?NAV_PROD:NAV_INT;
+  const nav2=document.getElementById('sidebar-nav');
+  nav2.innerHTML='';
+  nav.forEach(n=>{
+    if(n.sec){nav2.innerHTML+=`<div class="nav-sec">${n.sec}</div>`;return;}
+    nav2.innerHTML+=`<div class="nav-item" id="ni-${n.id}" onclick="nav2('${n.id}')"><span class="ni-icon">${n.ic}</span>${n.lb}${n.badge?`<span class="ni-badge ${n.bc||''}">${n.badge}</span>`:''}</div>`;
+  });
+  const first=(mode==='production'?NAV_PROD:NAV_INT).find(n=>n.id);
+  if(first) nav2(first.id);
+}
+function nav2(pid){
+  dch();_page=pid;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('ni-'+pid);if(el)el.classList.add('active');
+  document.getElementById('pg-title').textContent=TITLES[pid]||pid;
+  document.getElementById('pg-meta').textContent=_mode==='production'?'Mars 2026 · /mad API':'Avril 2026 · Gestion interne';
+  const c=document.getElementById('content');
+  c.className='content';c.innerHTML=renderPage(pid);void c.offsetWidth;c.className='content fade-in';
+  initPage(pid);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// PAGE RENDERERS
+// ═══════════════════════════════════════════════════════════════════════
+function renderPage(p){
+  const u=_user;
+  if(p==='dashboard') return pgDashboard(u);
+  if(p==='collab') return pgCollab();
+  if(p==='ecritures') return pgEcritures();
+  if(p==='attente') return pgAttente();
+  if(p==='sources') return pgSources();
+  if(p==='declarations') return pgDeclarations();
+  if(p==='finance') return pgFinance();
+  if(p==='balance') return pgBalance();
+  if(p==='ged') return pgGed();
+  if(p==='relances') return u?.isAdmin?pgRelances():accessDenied();
+  if(p==='home-int') return pgHomeInt(u);
+  if(p==='conges') return pgConges();
+  if(p==='objectifs') return u?.isAdmin?pgObjectifs():accessDenied();
+  if(p==='formations') return pgFormations();
+  if(p==='taches') return pgTaches();
+  if(p==='docs') return pgDocs();
+  if(p==='annuaire') return pgAnnuaire();
+  return '';
+}
+function initPage(p){
+  if(p==='finance') iFC(_ft);
+  if(p==='balance') iBal();
+  if(p==='sources') iSrc();
+  if(p==='objectifs') iObj();
+  if(p==='home-int') iHomeInt();
+  if(p==='dashboard') iDashboard();
+}
+function accessDenied(){return`<div class="access-denied"><div class="adi">🔒</div><h3>Accès restreint</h3><p>Cette section est réservée aux administrateurs du cabinet.</p></div>`;}
+
+// ── DASHBOARD PRODUCTION ──────────────────────────────────────────────
+function pgDashboard(u){
+  const h=new Date().getHours();const g=h<12?'Bonjour':'Bonsoir';
+  const ph=u?.photo?`<img src="${u.photo}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,.4)" referrerpolicy="no-referrer">`:`<div style="width:48px;height:48px;border-radius:50%;background:${u?.color||'#888'}22;color:${u?.color||'#888'};border:2px solid ${u?.color||'#888'}44;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:17px;font-weight:700;flex-shrink:0">${u?.initials||'?'}</div>`;
+  return`
+  <div class="wc"><div>${ph}</div><div class="wt"><h2>${g}, ${u?.name?.split(' ')[0]||'...'} 👋</h2><p>2 demandes de congés en attente · 64 écritures draft · EI Marchand TVA en retard</p><div class="wtime">${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div></div></div>
+  <div class="kpi-row k4">
+    ${kp('#2d4a6e','Dossiers actifs','147','sur 160 au total','↑ +4 ce mois','up')}
+    ${kp('#3a8a5e','Taux d\'avancement','68%','Objectif : 75%','→ En progression','wn')}
+    ${kp('#d95b4a','Écritures en attente','64','dans 6 dossiers','↑ +3 vs semaine','dn')}
+    ${kp('#c9a84c','Comptes 47x non soldés','8','21 600 € en suspens','2 > 30 jours','wn')}
+  </div>
+  <div class="g3">
+    <div class="card">
+      <div class="ch"><div class="ct">Activité — 4 dernières semaines</div><div class="cm">Écritures validées</div></div>
+      <div class="mcw">${[{l:'S1',v:42},{l:'S2',v:58},{l:'S3',v:51},{l:'S4',v:71}].map((b,i)=>`<div class="bc"><div class="br" style="height:${Math.round(b.v*.7)}px;background:${i===3?'#1a2f47':'#d1dce8'}"></div><div class="bl">${b.l}</div></div>`).join('')}</div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Alertes du jour</div></div>
+      <div class="al"><div class="ai" style="background:#fef2f2">🔴</div><div style="flex:1"><div class="at">EI Marchand — TVA en retard</div><div class="as">34 jours · Bruno Venticello</div></div><div class="atime">Urgent</div></div>
+      <div class="al"><div class="ai" style="background:#fffbeb">⚠️</div><div style="flex:1"><div class="at">23 écritures non validées</div><div class="as">EI Marchand · 7 jours</div></div><div class="atime">5j</div></div>
+      <div class="al"><div class="ai" style="background:#f0fdf4">✅</div><div style="flex:1"><div class="at">EURL Thomas — bilan clôturé</div><div class="as">Par Bruno Venticello</div></div><div class="atime">Auj.</div></div>
+      <div class="al"><div class="ai" style="background:#fef9ec">📄</div><div style="flex:1"><div class="at">3 documents à classer</div><div class="as">GED — Beaumont, Marchand</div></div><div class="atime">Nouveau</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Prochaines échéances fiscales</div><div class="cm">7 jours</div></div>
+    <table class="tbl"><thead><tr><th>Dossier</th><th>Type</th><th>Échéance</th><th>Responsable</th><th>Statut</th></tr></thead><tbody>
+      <tr><td><strong>SARL Leblanc</strong></td><td>Déclaration TVA</td><td style="color:#d95b4a;font-weight:500">Demain</td><td>Jade Marot</td><td>${bd('bbd','Urgent')}</td></tr>
+      <tr><td><strong>EI Marchand</strong></td><td>Liasse IS</td><td>2 avr.</td><td>Bruno Venticello</td><td>${bd('bwn','En cours')}</td></tr>
+      <tr><td><strong>SCI Les Pins</strong></td><td>Liasse fiscale</td><td>5 avr.</td><td>Bruno Venticello</td><td>${bd('bok','Préparé')}</td></tr>
+      <tr><td><strong>EURL Thomas</strong></td><td>Bilan annuel</td><td>7 avr.</td><td>Bruno Venticello</td><td>${bd('bok','Clôturé')}</td></tr>
+    </tbody></table>
+  </div>
+  <div style="height:170px;padding:10px 14px;position:relative" class="card"><div class="ch" style="border-bottom:none;padding-bottom:0"><div class="ct">Indicateurs collaborateurs</div></div><canvas id="dashChart" style="position:absolute;bottom:8px;left:14px;right:14px;width:calc(100% - 28px);height:130px"></canvas></div>`;}
+function iDashboard(){
+  const ctx=document.getElementById('dashChart');if(!ctx)return;
+  _charts.dash=new Chart(ctx,{type:'bar',data:{labels:TEAM.map(t=>t.n.split(' ')[0]),datasets:[{label:'Dossiers',data:[48,62,37],backgroundColor:'rgba(26,47,71,.7)',borderRadius:3,borderSkipped:false},{label:'Tâches faites',data:[3,5,2],backgroundColor:'rgba(201,168,76,.6)',borderRadius:3,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:8,padding:8}}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#7a7060'}},y:{grid:{color:'rgba(232,228,219,.5)'},ticks:{font:{size:10},color:'#7a7060'}}}}});}
+
+// ── COLLABORATEURS ────────────────────────────────────────────────────
+function pgCollab(){return`
+  <div class="kpi-row k3">${kp('#2d4a6e','Collaborateurs actifs','3','cabinet PARTEXPERT')} ${kp('#d95b4a','Surcharge','1','Adrien Paris à 96%')} ${kp('#c9a84c','Dossiers assignés','147','sur 160 actifs')}</div>
+  <div class="card"><div class="ch"><div class="ct">Charge par collaborateur</div><div class="cm">Mars 2026</div></div>
+  <table class="tbl"><thead><tr><th>Collaborateur</th><th>Rôle</th><th>Dossiers</th><th style="width:175px">Avancement</th><th>Statut</th></tr></thead><tbody>
+  ${COLLAB.map(c=>{const m=team(c.i);const bar=c.pct>=90?'#d95b4a':c.pct>=70?'#d47e2a':'#3a8a5e';const[cls,lbl]=c.s==='surcharge'?['#d95b4a','Surcharge']:c.s==='conge'?['#ccc','Congé']:['#3a8a5e','Normal'];return`<tr><td><div style="display:flex;align-items:center;gap:8px">${avEl(c.i)}<strong>${m.n}</strong></div></td><td style="color:var(--muted)">${m.r}</td><td><strong>${c.dos}</strong><span style="color:var(--muted)"> / ${c.max}</span></td><td><div class="pw"><div class="pb"><div class="pf" style="width:${c.pct}%;background:${bar}"></div></div><span class="pp" style="color:${bar}">${c.pct}%</span></div></td><td><span style="display:flex;align-items:center;gap:5px;font-size:12px"><span style="width:6px;height:6px;border-radius:50%;background:${cls};display:inline-block"></span>${lbl}</span></td></tr>`;}).join('')}
+  </tbody></table></div>`;}
+
+// ── ÉCRITURES ─────────────────────────────────────────────────────────
+function pgEcritures(){return`
+  <div class="kpi-row k3">${kp('#d95b4a','Total lignes','64','non validées')} ${kp('#d47e2a','Dossiers concernés','6',null)} ${kp('#c9a84c','Ancienneté max','7j','EI Marchand')}</div>
+  <div class="card"><div class="ch"><div class="ct">Écritures en attente de validation (draft)</div><div class="cm">GET /mad/entries?draft</div></div>
+  <table class="tbl"><thead><tr><th>Dossier</th><th>Réf.</th><th>Lignes</th><th>Ancienneté</th><th>Responsable</th><th>Source</th><th></th></tr></thead><tbody>
+  ${ECRITURES.map(e=>{const ac=e.age>5?'bbd':e.age>2?'bwn':'bok';const m=team(e.resp);return`<tr><td><strong>${e.d}</strong></td><td style="font-family:monospace;color:var(--navy2)">${e.ref}</td><td style="font-weight:600;color:var(--navy)">${e.nb}</td><td>${bd(ac,e.age+'j')}</td><td><div style="display:flex;align-items:center;gap:6px">${avEl(e.resp,22)}<span style="font-size:11px">${m.n.split(' ')[0]}</span></div></td><td>${bd('bbl',e.src)}</td><td>${rb(e.email,`Validation écritures — ${e.d}`,`Bonjour,\n\n${e.nb} écriture(s) en attente de validation pour le dossier ${e.d}.\n\nMerci de nous faire parvenir les justificatifs.\n\nCordialement,\nAdrien PARIS — PARTEXPERT`)}</td></tr>`;}).join('')}
+  </tbody></table></div>`;}
+
+// ── COMPTES D'ATTENTE ─────────────────────────────────────────────────
+function pgAttente(){return`
+  <div class="kpi-row k3">${kp('#d47e2a','Lignes en 47x','8','non soldées')} ${kp('#d95b4a','Montant en suspens','21 581 €','total cumulé')} ${kp('#c9a84c','Ancienneté max','41j','SARL Dupuis')}</div>
+  <div class="card"><div class="ch"><div class="ct">Comptes transitoires non soldés (47x)</div><div class="cm">GET /mad/movements?classAccount=47</div></div>
+  <table class="tbl"><thead><tr><th>Dossier</th><th>Compte</th><th>Libellé</th><th>Montant</th><th>Ancienneté</th><th></th></tr></thead><tbody>
+  ${ATTENTE.map(a=>{const ac=a.age>30?'bbd':a.age>14?'bwn':'bok';return`<tr><td><strong>${a.d}</strong></td><td style="font-family:monospace;color:var(--navy2)">${a.cpt}</td><td style="color:var(--muted)">${a.lib}</td><td style="font-weight:600">${a.mt}</td><td>${bd(ac,a.age+'j')}</td><td>${rb(a.email,`Régularisation ${a.cpt} — ${a.d}`,`Bonjour,\n\n${a.mt} en suspens sur le compte ${a.cpt} (${a.lib}) depuis ${a.age} jours.\n\nMerci de nous communiquer les justificatifs.\n\nCordialement,\nAdrien PARIS — PARTEXPERT`)}</td></tr>`;}).join('')}
+  </tbody></table></div>`;}
+
+// ── SOURCES ───────────────────────────────────────────────────────────
+const SOURCES_V2=[
+  {label:'Reconnaissance automatique (OCR)',short:'OCR',n:1210,color:'#1a2f47',auto:true},
+  {label:'Flux bancaires automatiques',short:'Banque',n:866,color:'#2d6a8f',auto:true},
+  {label:'Saisie collaborateur',short:'Saisie',n:427,color:'#c9a84c',auto:false},
+  {label:'Import via API partenaire',short:'API',n:400,color:'#3a8a5e',auto:true},
+  {label:'Écritures récurrentes auto.',short:'Abonnement',n:104,color:'#5b9bd5',auto:true},
+  {label:'Import fichier Excel',short:'Excel',n:66,color:'#7b5ea7',auto:false},
+  {label:'Opérations diverses TVA',short:'OD TVA',n:56,color:'#d47e2a',auto:false},
+  {label:'Saisie manuelle directe',short:'Manuel',n:38,color:'#d95b4a',auto:false},
+];
+const DOSSIERS_V2=[
+  {name:'SARL Beaumont',mainSrc:'OCR',auto:88,manual:12,total:477},
+  {name:'SCI Les Pins',mainSrc:'Abonnement',auto:82,manual:18,total:117},
+  {name:'SARL Leblanc',mainSrc:'OCR + Banque',auto:80,manual:20,total:738},
+  {name:'SAS Horizon',mainSrc:'API + OCR',auto:79,manual:21,total:855},
+  {name:'SARL Dupuis',mainSrc:'OCR + Banque',auto:74,manual:26,total:455},
+  {name:'EURL Thomas',mainSrc:'Banque',auto:65,manual:35,total:175},
+  {name:'EI Marchand',mainSrc:'OCR',auto:60,manual:40,total:306},
+];
+function pgSources(){
+  const TOTAL=SOURCES_V2.reduce((s,x)=>s+x.n,0);
+  const sorted=[...SOURCES_V2].sort((a,b)=>b.n-a.n);
+  const bars=sorted.map(s=>{const pct=Math.round(s.n/TOTAL*100);return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:11px"><div style="width:200px;font-size:12px;color:var(--text);flex-shrink:0">${s.label}</div><div style="flex:1;height:22px;background:var(--surface2);border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${s.color};border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:500;color:#fff;white-space:nowrap">${pct>=8?pct+'%':''}</div></div><div style="width:40px;text-align:right;font-size:12px;font-weight:500;color:var(--text)">${s.n}</div></div>`;}).join('');
+  return`
+  <div class="kpi-row k4">${kp('#2d4a6e','Total écritures mars','2 847','sur 147 dossiers')} ${kp('#3a8a5e','Entrées automatiques','74%','OCR + banque + abonnements','↑ +4pts vs fév.','up')} ${kp('#c9a84c','Saisie manuelle','26%','↓ 4 points vs fév.')} ${kp('#d95b4a','Corrections OCR','92','sur 1 210 lignes (3,2%)')}</div>
+  <div style="background:var(--surface2);border-left:3px solid #2d6a8f;border-radius:0 7px 7px 0;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--navy2);line-height:1.6">
+    74% des écritures entrent sans intervention humaine. EI Marchand et EURL Thomas ont le taux de saisie manuelle le plus élevé du portefeuille.
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="ch"><div class="ct">D'où viennent les écritures ?</div><div class="cm">Mars 2026 · 2 847 au total</div></div>
+      <div style="padding:14px 16px">${bars}</div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Évolution de l'automatisation</div><div class="cm">6 derniers mois</div></div>
+      <div style="padding:12px 16px">
+        <div style="display:flex;gap:14px;margin-bottom:10px;font-size:11px;color:var(--muted)">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#1a2f47;display:inline-block"></span>Automatisé</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#c9a84c;display:inline-block"></span>Saisie manuelle</span>
+        </div>
+        <div style="position:relative;height:155px"><canvas id="evolC"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Niveau d'automatisation par dossier</div><div class="cm">Filtrer par niveau</div></div>
+    <div style="padding:10px 16px 6px;display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn" id="sf-all" onclick="srcFilter('all',this)" style="border-radius:20px;font-size:11px">Tous</button>
+      <button class="btn" id="sf-ok" onclick="srcFilter('ok',this)" style="border-radius:20px;font-size:11px">Bien automatisés ≥ 75%</button>
+      <button class="btn" id="sf-warn" onclick="srcFilter('warn',this)" style="border-radius:20px;font-size:11px">À améliorer 50–75%</button>
+      <button class="btn" id="sf-bad" onclick="srcFilter('bad',this)" style="border-radius:20px;font-size:11px">Saisie dominante &lt; 50%</button>
+    </div>
+    <table class="tbl"><thead><tr><th>Dossier</th><th>Source principale</th><th style="width:185px">Taux automatisation</th><th>Saisie</th><th>Total</th><th>Niveau</th></tr></thead>
+    <tbody id="src-tbody"></tbody></table>
+  </div>`;}
+function srcFilter(f,el){
+  document.querySelectorAll('[id^="sf-"]').forEach(b=>{b.style.background='';b.style.color='';b.style.borderColor='';});
+  el.style.background='var(--navy)';el.style.color='#fff';el.style.borderColor='var(--navy)';
+  renderSrcTable(f);
+}
+function renderSrcTable(f){
+  const tbody=document.getElementById('src-tbody');if(!tbody)return;
+  const filtered=DOSSIERS_V2.filter(d=>f==='ok'?d.auto>=75:f==='warn'?d.auto>=50&&d.auto<75:f==='bad'?d.auto<50:true);
+  tbody.innerHTML=filtered.map(d=>{
+    const col=d.auto>=75?'#3a8a5e':d.auto>=50?'#d47e2a':'#d95b4a';
+    const [bc,bl]=d.auto>=75?['bok','Bien automatisé']:d.auto>=50?['bwn','À améliorer']:['bbd','Saisie dominante'];
+    return`<tr><td><strong>${d.name}</strong></td><td style="color:var(--muted)">${d.mainSrc}</td><td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;max-width:80px;height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:${d.auto}%;background:${col}"></div></div><span style="font-size:12px;font-weight:500;color:${col}">${d.auto}%</span></div></td><td style="color:var(--muted)">${d.manual}%</td><td>${d.total}</td><td>${bd(bc,bl)}</td></tr>`;
+  }).join('');
+}
+function iSrc(){
+  document.getElementById('sf-all').style.background='var(--navy)';
+  document.getElementById('sf-all').style.color='#fff';
+  document.getElementById('sf-all').style.borderColor='var(--navy)';
+  renderSrcTable('all');
+  const ec=document.getElementById('evolC');
+  if(ec)_charts.e=new Chart(ec,{type:'line',data:{labels:['Oct','Nov','Déc','Jan','Fév','Mar'],datasets:[{label:'Automatisé %',data:[58,61,63,68,70,74],borderColor:'#1a2f47',backgroundColor:'rgba(26,47,71,.08)',borderWidth:2,pointBackgroundColor:'#1a2f47',pointRadius:4,tension:.4,fill:true},{label:'Saisie manuelle %',data:[42,39,37,32,30,26],borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,.06)',borderWidth:2,pointBackgroundColor:'#c9a84c',pointRadius:4,tension:.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#7a7060'}},y:{min:0,max:100,grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10},color:'#7a7060',callback:v=>v+'%'}}}}});}
+
+// ── DÉCLARATIONS ──────────────────────────────────────────────────────
+function pgDeclarations(){return`
+  <div class="kpi-row k4">${kp('#3a8a5e','Validées','5',null)} ${kp('#d47e2a','En attente','2',null)} ${kp('#d95b4a','En retard','1',null)} ${kp('#2d4a6e','Complétion','63%',null)}</div>
+  <div class="card"><div class="ch"><div class="ct">Suivi déclarations TVA</div><div class="cm">GET /mad/entries?source=OD_TVA</div></div>
+  <table class="tbl"><thead><tr><th>Dossier</th><th>Régime</th><th>Période</th><th>Statut</th><th>Montant</th><th></th></tr></thead><tbody>
+  ${TVA.map(t=>{const sc=t.s==='validée'?'bok':t.s==='en retard'?'bbd':'bwn';const btn=t.s!=='validée'?rb(t.email||'',`Déclaration TVA ${t.per} — ${t.d}`,`Bonjour,\n\nVotre déclaration de TVA pour la période ${t.per} est ${t.s}.\n\nMerci de nous transmettre les éléments nécessaires.\n\nCordialement,\nAdrien PARIS — PARTEXPERT`):'';return`<tr><td><strong>${t.d}</strong></td><td>${t.reg}</td><td>${t.per}</td><td>${bd(sc,t.s)}</td><td style="font-weight:500">${t.mt}</td><td>${btn}</td></tr>`;}).join('')}
+  </tbody></table></div>`;}
+
+// ── FINANCE ───────────────────────────────────────────────────────────
+function pgFinance(){return`
+  <div class="tabs"><button class="tab ${_ft==='treso'?'active':''}" onclick="swFT('treso',this)">Trésorerie</button><button class="tab ${_ft==='ca'?'active':''}" onclick="swFT('ca',this)">Chiffre d'affaires</button></div>
+  <div id="fb">${_ft==='treso'?fTreso():fCA()}</div>`;}
+function swFT(t,el){dch();_ft=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('fb').innerHTML=t==='treso'?fTreso():fCA();iFC(t);}
+function selC(id,el){_fc=id;document.querySelectorAll('.cpill').forEach(p=>p.classList.remove('active'));el.classList.add('active');dch();document.getElementById('fb').innerHTML=_ft==='treso'?fTreso():fCA();iFC(_ft);}
+function fTreso(){
+  const tot=Object.values(FIN).reduce((s,d)=>s+d.solde,0);
+  const d=FIN[_fc],cn=CLIENTS.find(c=>c.id===_fc).name,vU=d.vr.startsWith('+');
+  return`
+  <div class="kpi-row k4">${kp('#2d4a6e','Trésorerie totale',fmt(Math.round(tot/1000))+' k€','sur 7 dossiers')} ${kp('#3a8a5e','Positives','5 / 7',null)} ${kp('#d95b4a','Critique','1','EI Marchand < 20k€')} ${kp('#c9a84c','Variation moy.','+7%','vs mois précédent')}</div>
+  ${csel(_fc)}
+  <div class="g3">
+    <div class="card"><div class="ch"><div class="ct">Évolution — ${cn}</div><div class="cm">7 mois · k€</div></div><div style="padding:8px 13px;height:175px;position:relative"><canvas id="tC"></canvas></div></div>
+    <div class="card"><div class="ch"><div class="ct">Solde actuel</div></div><div class="cb">
+      <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:var(--navy);margin-bottom:3px">${fmt(d.solde/1000)} k€</div>
+      <div style="font-size:13px;color:${vU?'var(--green)':'var(--red)'};font-weight:500;margin-bottom:12px">${d.vr} vs mois précédent</div>
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">Flux mars</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Encaissements</span><span style="font-weight:500;color:var(--green)">+${d.ca[6]}k€</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Décaissements</span><span style="font-weight:500;color:var(--red)">-${d.ch[6]}k€</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding-top:5px;border-top:1px solid var(--border)"><span style="font-weight:500">Flux net</span><span style="font-weight:600;color:var(--navy)">+${d.ca[6]-d.ch[6]}k€</span></div>
+    </div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">Comparatif tous dossiers</div><div class="cm">Mars 2026</div></div>
+  <table class="tbl"><thead><tr><th>Dossier</th><th>Secteur</th><th>Solde</th><th>Variation</th><th>Tendance</th><th>Risque</th></tr></thead><tbody>
+  ${CLIENTS.map(c=>{const d=FIN[c.id],vU=d.vr.startsWith('+');const risk=d.solde<20000?'bbd':d.solde<50000?'bwn':'bok',rl=d.solde<20000?'Critique':d.solde<50000?'Vigilance':'Normal';return`<tr><td><strong>${c.name}</strong></td><td>${bd('bgr',c.secteur)}</td><td style="font-weight:600;font-family:'Playfair Display',serif">${fmt(d.solde/1000)} k€</td><td style="color:${vU?'var(--green)':'var(--red)'};font-weight:500">${d.vr}</td><td><div class="sp" style="width:65px">${spk(d.treso,vU?'#3a8a5e':'#d95b4a')}</div></td><td>${bd(risk,rl)}</td></tr>`;}).join('')}
+  </tbody></table></div>`;}
+function fCA(){
+  const d=FIN[_fc],cn=CLIENTS.find(c=>c.id===_fc).name;
+  const p=Math.round(d.ytd/d.obj*100*1000),col=p>=70?'#3a8a5e':p>=50?'#d47e2a':'#d95b4a';
+  return`
+  <div class="kpi-row k4">${kp('#2d4a6e','CA total portefeuille',fmt(Object.values(FIN).reduce((s,d)=>s+d.ytd,0))+' k€','YTD oct.→mars')} ${kp('#3a8a5e','Objectif annuel','3 470 k€','taux atteint : 56%')} ${kp('#c9a84c','Meilleure croissance','SAS Horizon','+28% vs N-1')} ${kp('#d95b4a','En retard','2','Leblanc, Marchand')}</div>
+  ${csel(_fc)}
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct">CA mensuel — ${cn}</div><div class="cm">CA vs Charges · k€</div></div><div style="padding:8px 13px;height:165px;position:relative"><canvas id="caC"></canvas></div></div>
+    <div class="card"><div class="ch"><div class="ct">Objectif annuel</div></div><div class="cb">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px">CA réalisé YTD</div>
+      <div style="font-family:'Playfair Display',serif;font-size:27px;font-weight:700;color:var(--navy);margin-bottom:2px">${d.ytd} k€</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">sur ${fmt(d.obj/1000)} k€</div>
+      <div class="pw" style="margin-bottom:4px"><div class="pb" style="height:6px"><div class="pf" style="width:${p}%;background:${col}"></div></div><span style="font-size:11px;font-weight:600;color:${col};min-width:30px;text-align:right">${p}%</span></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Reste : <strong style="color:var(--text)">${fmt(d.obj/1000-d.ytd)} k€</strong></div>
+      <div style="padding-top:8px;border-top:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>CA mars</span><span style="font-weight:600;color:var(--green)">${d.ca[6]}k€</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Charges mars</span><span style="font-weight:600;color:var(--red)">${d.ch[6]}k€</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;padding-top:5px;border-top:1px solid var(--border)"><span style="font-weight:500">Résultat brut</span><span style="font-weight:700;color:var(--navy)">${d.ca[6]-d.ch[6]}k€</span></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">Tableau CA — tous dossiers</div><div class="cm">YTD oct.→mars 2026</div></div>
+  <table class="tbl"><thead><tr><th>Dossier</th><th>CA YTD</th><th>Objectif</th><th>Atteinte</th><th>Résultat mars</th><th>Tendance</th></tr></thead><tbody>
+  ${CLIENTS.map(c=>{const d=FIN[c.id],pp=Math.round(d.ytd/d.obj*100*1000),cl=pp>=70?'#3a8a5e':pp>=50?'#d47e2a':'#d95b4a',res=d.ca[6]-d.ch[6];return`<tr><td><strong>${c.name}</strong></td><td style="font-weight:600;font-family:'Playfair Display',serif">${d.ytd} k€</td><td style="color:var(--muted)">${fmt(d.obj/1000)} k€</td><td><div class="pw"><div class="pb"><div class="pf" style="width:${pp}%;background:${cl}"></div></div><span style="font-size:11px;font-weight:600;color:${cl};min-width:28px;text-align:right">${pp}%</span></div></td><td style="font-weight:600;color:${res>5?'var(--green)':res>0?'var(--orange)':'var(--red)'}">${res>0?'+':''}${res}k€</td><td><div class="sp" style="width:60px">${spk(d.ca,'#2d4a6e')}</div></td></tr>`;}).join('')}
+  </tbody></table></div>`;}
+function iFC(tab){
+  const d=FIN[_fc];
+  if(tab==='treso'){const ctx=document.getElementById('tC');if(!ctx)return;_charts.t=new Chart(ctx,{type:'line',data:{labels:MOIS,datasets:[{label:'Trésorerie (k€)',data:d.treso,borderColor:'#1a2f47',backgroundColor:'rgba(26,47,71,.07)',borderWidth:2,pointBackgroundColor:'#1a2f47',pointRadius:3,tension:.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#7a7060'}},y:{grid:{color:'rgba(232,228,219,.5)'},ticks:{font:{size:10},color:'#7a7060',callback:v=>v+'k'}}}}});}
+  else{const ctx=document.getElementById('caC');if(!ctx)return;_charts.ca=new Chart(ctx,{type:'bar',data:{labels:MOIS,datasets:[{label:'CA',data:d.ca,backgroundColor:'rgba(26,47,71,.8)',borderRadius:3,borderSkipped:false},{label:'Charges',data:d.ch,backgroundColor:'rgba(217,91,74,.7)',borderRadius:3,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:8,padding:8}}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#7a7060'}},y:{grid:{color:'rgba(232,228,219,.5)'},ticks:{font:{size:10},color:'#7a7060',callback:v=>v+'k'}}}}});}
+}
+
+// ── BALANCE ───────────────────────────────────────────────────────────
+function pgBalance(){
+  const t411=Object.values(FIN).reduce((s,d)=>s+d.cli411,0);
+  const t401=Object.values(FIN).reduce((s,d)=>s+d.fou401,0);
+  return`
+  <div class="kpi-row k4">${kp('#2d4a6e','Créances 411',fmt(t411/1000)+' k€','non lettrées')} ${kp('#d95b4a','Dettes 401',fmt(t401/1000)+' k€','non réglées')} ${kp('#3a8a5e','Solde net',fmt(Math.round((t411-t401)/1000))+' k€','créances > dettes')} ${kp('#c9a84c','Relances à envoyer','4','créances > 30 jours')}</div>
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct">Créances clients (411)</div><div class="cm">GET /mad/movements?classAccount=411&lettering=none</div></div>
+    <table class="tbl"><thead><tr><th>Dossier</th><th>Montant</th><th>Délai</th><th>Risque</th></tr></thead><tbody>
+    ${CLIENTS.filter(c=>FIN[c.id].cli411>0).sort((a,b)=>FIN[b.id].cli411-FIN[a.id].cli411).map(c=>{const d=FIN[c.id],j=Math.round(d.cli411/d.ca[6]/10)+5,risk=j>45?'bbd':j>30?'bwn':'bok',rl=j>45?'Critique':j>30?'Vigilance':'Normal';return`<tr><td><strong>${c.name}</strong></td><td style="font-weight:600">${fmt(d.cli411)} €</td><td>${j}j</td><td>${bd(risk,rl)}</td></tr>`;}).join('')}
+    </tbody></table></div>
+    <div class="card"><div class="ch"><div class="ct">Dettes fournisseurs (401)</div><div class="cm">GET /mad/movements?classAccount=401&lettering=none</div></div>
+    <table class="tbl"><thead><tr><th>Dossier</th><th>Montant</th><th>Échéance</th></tr></thead><tbody>
+    ${CLIENTS.filter(c=>FIN[c.id].fou401>0).sort((a,b)=>FIN[b.id].fou401-FIN[a.id].fou401).map(c=>`<tr><td><strong>${c.name}</strong></td><td style="font-weight:600">${fmt(FIN[c.id].fou401)} €</td><td style="color:var(--muted)">30j</td></tr>`).join('')}
+    </tbody></table></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">Comparatif 411 vs 401</div></div>
+  <div style="height:185px;padding:8px 13px;position:relative"><canvas id="balC"></canvas></div></div>`;}
+function iBal(){const ctx=document.getElementById('balC');if(!ctx)return;_charts.b=new Chart(ctx,{type:'bar',data:{labels:CLIENTS.map(c=>c.name.replace(/SARL |SCI |SAS |EI |EURL /,'')),datasets:[{label:'Créances 411',data:CLIENTS.map(c=>FIN[c.id].cli411/1000),backgroundColor:'rgba(26,47,71,.75)',borderRadius:3,borderSkipped:false},{label:'Dettes 401',data:CLIENTS.map(c=>FIN[c.id].fou401/1000),backgroundColor:'rgba(217,91,74,.65)',borderRadius:3,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:8,padding:8}}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#7a7060'}},y:{grid:{color:'rgba(232,228,219,.5)'},ticks:{font:{size:10},color:'#7a7060',callback:v=>v+'k€'}}}}});}
+
+// ── GED ───────────────────────────────────────────────────────────────
+function pgGed(){return`
+  <div class="kpi-row k3">${kp('#c9a84c','À classer','3','Webhooks en attente')} ${kp('#3a8a5e','Classés ce mois','27',null)} ${kp('#2d4a6e','Total GED','842','documents stockés')}</div>
+  <div class="card"><div class="ch"><div class="ct">Documents récents</div><div class="cm">API GED + Webhooks temps réel</div></div>
+  <table class="tbl"><thead><tr><th>Dossier</th><th>Fichier</th><th>Type</th><th>Déposé le</th><th>Taille</th><th>Statut</th></tr></thead><tbody>
+  ${[{d:'SARL Beaumont',f:'Facture_BEAU_FEV2026_001.pdf',t:'Achat',dt:'28/02',sz:'234 Ko',s:'A classer'},
+    {d:'EI Marchand',f:'Relevé_LCL_FEV26.pdf',t:'Banque',dt:'01/03',sz:'87 Ko',s:'A classer'},
+    {d:'SCI Les Pins',f:'Contrat_bail_2026.pdf',t:'Divers',dt:'02/03',sz:'1,2 Mo',s:'A classer'},
+    {d:'SARL Leblanc',f:'Facture_LEBL_0023.pdf',t:'Achat',dt:'25/02',sz:'156 Ko',s:'Classé'},
+    {d:'SAS Horizon',f:'BS_Fev2026.pdf',t:'Paie',dt:'27/02',sz:'320 Ko',s:'Classé'},
+  ].map(g=>`<tr><td><strong>${g.d}</strong></td><td style="font-family:monospace;font-size:11px;color:var(--navy2)">${g.f}</td><td>${g.t}</td><td>${g.dt}</td><td style="color:var(--muted)">${g.sz}</td><td>${bd(g.s==='A classer'?'bwn':'bok',g.s)}</td></tr>`).join('')}
+  </tbody></table></div>`;}
+
+// ── RELANCES ──────────────────────────────────────────────────────────
+function pgRelances(){return`
+  <div class="kpi-row k3">${kp('#c9a84c','Relances envoyées','14','ce mois via Gmail')} ${kp('#3a8a5e','Taux de réponse','71%',null)} ${kp('#2d4a6e','Délai moyen','2,3j','après relance')}</div>
+  <div class="card"><div class="ch"><div class="ct">Historique des relances</div><div class="cm">Envoyées via Gmail</div></div>
+  <table class="tbl"><thead><tr><th>Date</th><th>Dossier</th><th>Type</th><th>Destinataire</th><th>Statut</th></tr></thead><tbody>
+    <tr><td>01/03</td><td><strong>SARL Dupuis</strong></td><td>Compte 47x</td><td>dupuis@dupuis-sa.fr</td><td>${bd('bok','Répondu (24h)')}</td></tr>
+    <tr><td>28/02</td><td><strong>EI Marchand</strong></td><td>TVA en retard</td><td>j.marchand@gmail.com</td><td>${bd('bwn','En attente')}</td></tr>
+    <tr><td>27/02</td><td><strong>SCI Les Pins</strong></td><td>Écritures draft</td><td>scilespins@notaire.fr</td><td>${bd('bok','Répondu (2j)')}</td></tr>
+    <tr><td>25/02</td><td><strong>SARL Beaumont</strong></td><td>Docs manquants</td><td>contact@beaumont-sarl.fr</td><td>${bd('bok','Répondu (1j)')}</td></tr>
+    <tr><td>22/02</td><td><strong>SAS Horizon</strong></td><td>TVA en attente</td><td>compta@horizon-sas.fr</td><td>${bd('bbd','Sans réponse')}</td></tr>
+  </tbody></table></div>
+  <div style="text-align:center;padding:6px 0"><button class="btn btn-p" onclick="openModal('','Relance groupée — Documents manquants','Bonjour,\n\nDes documents sont en attente pour la clôture de votre dossier.\n\nMerci de les déposer dans votre espace client.\n\nCordialement,\nAdrien PARIS — PARTEXPERT')">+ Créer une relance groupée</button></div>`;}
+
+// ═══════════════════════════════════════════════════════════════════════
+// PAGES INTERNE
+// ═══════════════════════════════════════════════════════════════════════
+
+// ── HOME INTERNE ──────────────────────────────────────────────────────
+function pgHomeInt(u){
+  const h=new Date().getHours();const g=h<12?'Bonjour':'Bonsoir';
+  const ph=u?.photo?`<img src="${u.photo}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,.4)" referrerpolicy="no-referrer">`:`<div style="width:48px;height:48px;border-radius:50%;background:${u?.color||'#888'}22;color:${u?.color||'#888'};border:2px solid ${u?.color||'#888'}44;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:17px;font-weight:700">${u?.initials||'?'}</div>`;
+  return`
+  <div class="wc"><div>${ph}</div><div class="wt"><h2>${g}, ${u?.name?.split(' ')[0]||'...'} — Espace interne</h2><p>2 demandes de congés en attente · 5 tâches en cours · Réunion équipe le 8 avril</p><div class="wtime">${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div></div></div>
+  <div class="kpi-row k4">${kp('var(--teal)','Collaborateurs actifs','7','1 en arrêt maladie')} ${kp('#d47e2a','Congés en attente','2','à approuver')} ${kp('#3a6ea8','Tâches en cours','4','5 à faire')} ${kp('#c9a84c','Formations planifiées','2','avril 2026')}</div>
+  <div class="g3">
+    <div class="card">
+      <div class="ch"><div class="ct">Présence équipe — semaine du 7 avril</div><div class="cm">Google Calendar</div></div>
+      <div style="padding:4px 0">
+        ${TEAM.map(m=>{const isOff=m.i==='AP';return`<div style="display:flex;align-items:center;gap:9px;padding:6px 13px;border-bottom:1px solid rgba(232,228,219,.35)"><div class="av" style="width:24px;height:24px;font-size:9px;background:${m.c}22;color:${m.c}">${m.i}</div><div style="font-size:12px;font-weight:500;flex:1">${m.n}</div><div style="font-size:10px;color:var(--muted)">${m.r}</div><div style="display:flex;gap:2px">${['L','M','M','J','V'].map((j,idx)=>`<div style="width:20px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;background:${isOff&&idx>=1&&idx<=3?'rgba(201,168,76,.15)':'rgba(58,138,94,.1)'};color:${isOff&&idx>=1&&idx<=3?'#7a5020':'var(--green)'}">${j}</div>`).join('')}</div></div>`;}).join('')}
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="ch"><div class="ct">À traiter</div></div>
+        <div class="al"><div class="ai" style="background:#fff3cd">📋</div><div style="flex:1"><div class="at">Congés Bruno Venticello</div><div class="as">28-30 avril · 3 jours RTT</div></div><div style="display:flex;gap:4px"><button class="btn btn-ok" style="padding:3px 7px" onclick="approuver(2)">✓</button><button class="btn btn-no" style="padding:3px 7px" onclick="refuser(2)">✗</button></div></div>
+        <div class="al"><div class="ai" style="background:#fff3cd">📋</div><div style="flex:1"><div class="at">Congés Jade Marot</div><div class="as">22-23 avril · 2 jours CP</div></div><div style="display:flex;gap:4px"><button class="btn btn-ok" style="padding:3px 7px" onclick="approuver(3)">✓</button><button class="btn btn-no" style="padding:3px 7px" onclick="refuser(3)">✗</button></div></div>
+        <div class="al"><div class="ai" style="background:#e8f4fd">💻</div><div style="flex:1"><div class="at">Formation MyUnisoft à confirmer</div><div class="as">22 avril · Bruno Venticello</div></div><button class="btn" onclick="toast('Formation confirmée !')">Confirmer</button></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">Prochains événements</div><div class="cm">Avril</div></div>
+        ${[{d:'08 avr.',t:'Réunion mensuelle équipe',c:'var(--teal)'},{d:'14 avr.',t:'Congés AP — Pâques',c:'var(--gold)'},{d:'15 avr.',t:'Formation fact. électronique',c:'#3a6ea8'},{d:'22 avr.',t:'Formation MyUnisoft GED',c:'#3a6ea8'},{d:'28 avr.',t:'RTT Bruno Venticello',c:'var(--orange)'}].map(e=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 13px;border-bottom:1px solid rgba(232,228,219,.35)"><div style="width:36px;font-size:10px;font-weight:600;color:var(--muted);flex-shrink:0">${e.d}</div><div style="width:3px;height:22px;background:${e.c};border-radius:2px;flex-shrink:0"></div><div style="font-size:12px">${e.t}</div></div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+function iHomeInt(){
+  const ctx=document.getElementById('intChart');
+  if(!ctx)return;
+}
+function approuver(id){const c=CONGES.find(x=>x.id===id);if(c){c.s='approuvé';toast(`✓ Congés approuvés — ${c.nom}`);}}
+function refuser(id){const c=CONGES.find(x=>x.id===id);if(c){c.s='refusé';toast(`✗ Demande refusée — ${c.nom}`);}}
+
+// ── CONGÉS ────────────────────────────────────────────────────────────
+function pgConges(){
+  const days=['L','M','M','J','V','S','D'];const firstDay=2;
+  const cd={};
+  for(let d=14;d<=18;d++) cd[d]=(cd[d]||[]).concat('ap');
+  for(let d=7;d<=8;d++) cd[d]=(cd[d]||[]).concat('cm');
+  for(let d=22;d<=25;d++) cd[d]=(cd[d]||[]).concat('lm');
+  for(let d=28;d<=30;d++) cd[d]=(cd[d]||[]).concat('sb');
+  let calHTML='';
+  for(let i=0;i<firstDay;i++) calHTML+=`<div class="cd oth"></div>`;
+  for(let d=1;d<=30;d++){
+    const dow=(firstDay+d-1)%7;const isWE=dow>=5;const isToday=d===7;
+    const cds=cd[d]||[];
+    let cls=isWE?'we':'';
+    if(isToday) cls='today';
+    else if(cds.includes('ap')) cls+=' cap';
+    else if(cds.includes('cm')) cls+=' ccm';
+    else if(cds.includes('lm')) cls+=' clm';
+    else if(cds.includes('sb')) cls+=' csb';
+    calHTML+=`<div class="cd ${cls}" title="${d} avril">${d}</div>`;
+  }
+  return`
+  <div class="kpi-row k4">${kp('var(--teal)','Jours CP restants moy.','18j','par collaborateur')} ${kp('#d47e2a','Demandes en attente','2','à approuver')} ${kp('#3a8a5e','Demandes approuvées','4','ce mois')} ${kp('#3a6ea8','Absences prévues','3','semaine du 14 avril')}</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><div class="ct">Planning Avril 2026</div><div style="display:flex;gap:7px;font-size:10px;color:var(--muted);align-items:center">
+        ${[['rgba(201,168,76,.3)','AP'],['rgba(45,74,110,.2)','BV'],['rgba(58,138,94,.2)','JM']].map(([bg,l])=>`<span style="display:inline-flex;align-items:center;gap:3px"><span style="width:7px;height:7px;background:${bg};border-radius:2px;display:inline-block"></span>${l}</span>`).join('')}
+      </div></div>
+      <div class="cb">
+        <div class="cal-h">${days.map(d=>`<div class="cal-dn">${d}</div>`).join('')}</div>
+        <div class="cal-g">${calHTML}</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Solde congés</div><div class="cm">CP + RTT · 2026</div></div>
+      <table class="tbl" style="font-size:11px"><thead><tr><th>Collaborateur</th><th>CP restants</th><th>RTT</th></tr></thead><tbody>
+      ${[{i:'AP',cp:18,rtt:6},{i:'BV',cp:22,rtt:4},{i:'JM',cp:24,rtt:0}].map(r=>{const m=team(r.i);return`<tr><td><div style="display:flex;align-items:center;gap:6px"><div class="av" style="width:20px;height:20px;font-size:8px;background:${m.c}22;color:${m.c}">${m.i}</div>${m.n.split(' ')[0]}</div></td><td style="font-weight:600;color:var(--navy)">${r.cp}j</td><td style="color:var(--teal)">${r.rtt>0?r.rtt+'j':'—'}</td></tr>`;}).join('')}
+      </tbody></table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Demandes de congés</div><button class="btn btn-p" onclick="openCongeModal()">+ Nouvelle demande</button></div>
+    <table class="tbl"><thead><tr><th>Collaborateur</th><th>Type</th><th>Période</th><th>Durée</th><th>Statut</th><th></th></tr></thead><tbody>
+    ${CONGES.map(c=>{const sc=c.s==='approuvé'?'bok':c.s==='en attente'?'bwn':'bbd';const m=team(c.qui);return`<tr><td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:20px;height:20px;font-size:8px;background:${m.c}22;color:${m.c}">${c.qui}</div><strong>${c.nom.split(' ')[0]}</strong></div></td><td>${bd('bgr',c.type)}</td><td style="font-size:11px">${c.debut} → ${c.fin}</td><td style="font-weight:600">${c.jours}j</td><td>${bd(sc,c.s)}</td><td>${c.s==='en attente'?`<div style="display:flex;gap:4px"><button class="btn btn-ok" style="padding:3px 7px" onclick="approuver(${c.id})">✓</button><button class="btn btn-no" style="padding:3px 7px" onclick="refuser(${c.id})">✗</button></div>`:'—'}</td></tr>`;}).join('')}
+    </tbody></table>
+  </div>`;}
+function openCongeModal(){
+  document.getElementById('modal-body').innerHTML=`<div class="mh"><div class="mt">Nouvelle demande de congé</div><button class="mc" onclick="closeModal()">✕</button></div><div class="mb"><div class="field"><label>Collaborateur</label><select>${TEAM.map(m=>`<option>${m.n}</option>`).join('')}</select></div><div class="fr"><div class="field"><label>Début</label><input type="date" value="2026-04-20"></div><div class="field"><label>Fin</label><input type="date" value="2026-04-24"></div></div><div class="field"><label>Type</label><select><option>Congés payés</option><option>RTT</option><option>Congé sans solde</option><option>Arrêt maladie</option></select></div><div class="field"><label>Motif</label><textarea placeholder="Optionnel..."></textarea></div></div><div class="mf"><button class="btn" onclick="closeModal()">Annuler</button><button class="btn btn-p" onclick="closeModal();toast('Demande soumise ✓')">Soumettre</button></div>`;
+  document.getElementById('overlay').classList.add('show');
+}
+
+// ── OBJECTIFS ─────────────────────────────────────────────────────────
+function pgObjectifs(){
+  const total=OBJECTIFS.reduce((s,o)=>s+o.items.length,0);
+  const onTarget=OBJECTIFS.reduce((s,o)=>s+o.items.filter(it=>{const p=it.inv?it.act<=it.cib:it.act>=it.cib;return p;}).length,0);
+  const autoCount=OBJECTIFS.reduce((s,o)=>s+o.items.filter(it=>it.src==='auto').length,0);
+  return`
+  <div class="kpi-row k3">
+    ${kp('var(--teal)','Indicateurs suivis',total,'sur 3 collaborateurs')}
+    ${kp('#3a8a5e','Sur la cible',onTarget,'déjà atteints')}
+    ${kp('#2d4a6e','Automatiques (MyUnisoft)',autoCount,'mis à jour en temps réel')}
+  </div>
+  <div style="background:rgba(45,74,110,.06);border-left:3px solid #2d4a6e;border-radius:0 7px 7px 0;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--navy2);line-height:1.6">
+    ${autoCount} indicateurs se mettent à jour automatiquement via MyUnisoft. Les ${total-autoCount} autres nécessitent une saisie mensuelle de quelques chiffres.
+  </div>
+  ${OBJECTIFS.map(o=>{
+    const m=team(o.i);
+    return`<div class="oc">
+      <div class="oh">${avEl(o.i,32)}
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--navy)">${m.n}</div>
+          <div style="font-size:10px;color:var(--muted)">${m.r} · ${o.items.length} indicateurs · 2026</div>
+        </div>
+      </div>
+      ${o.items.map(it=>{
+        const pct=it.inv
+          ? Math.min(100,Math.round((it.cib/it.act)*100))
+          : Math.min(100,Math.round(it.act/it.cib*100));
+        const onT=it.inv?it.act<=it.cib:it.act>=it.cib;
+        const col=onT?'var(--green)':pct>=75?'var(--teal)':pct>=50?'var(--orange)':'var(--red)';
+        const srcBadge=it.src==='auto'
+          ? `<span style="font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(45,74,110,.1);color:var(--navy2);white-space:nowrap">API</span>`
+          : `<span style="font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(201,168,76,.1);color:#7a5020;white-space:nowrap">Manuel</span>`;
+        const arrow=it.inv?'↓':'↑';
+        return`<div class="oi">
+          <div class="ol" style="display:flex;align-items:center;gap:7px">${it.l}${srcBadge}</div>
+          <div class="pw" style="flex:1;max-width:220px">
+            <div class="pb"><div class="pf" style="width:${pct}%;background:${col}"></div></div>
+            <span class="pp" style="color:${col}">${pct}%</span>
+          </div>
+          <div class="otg" style="font-size:11px;color:${col};font-weight:500">${it.act} ${arrow} ${it.cib} ${it.u}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('')}
+  <div style="text-align:center;padding:6px 0;font-size:11px;color:var(--muted)">Tous les indicateurs sont mis à jour automatiquement via MyUnisoft.</div>`;}
+function openObjModal(){}
+function iObj(){}
+
+// ── FORMATIONS ────────────────────────────────────────────────────────
+function pgFormations(){
+  const sc={'planifiée':'bbl','en cours':'bwn','terminée':'bok'};
+  return`
+  <div class="kpi-row k4">${kp('var(--teal)','Planifiées','2','avril 2026')} ${kp('#d47e2a','En cours','1','Excel — Jade Marot')} ${kp('#3a8a5e','Terminées cette année','2',null)} ${kp('#c9a84c','Heures moy.','14h','par collaborateur')}</div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn btn-p" onclick="toast('Ouverture du catalogue de formations')">+ Planifier une formation</button></div>
+  ${FORMATIONS.map(f=>`<div class="fc"><div class="fi" style="background:rgba(42,122,114,.1)">${f.icon}</div><div style="flex:1"><div class="fn">${f.titre}${f.oblig?` ${bd('bbd','Obligatoire')}`:''}${!f.oblig?` ${bd('bgr','Facultatif')}`:''}</div><div class="fs">${f.org} · ${f.date} · ${f.dur}</div><div class="ff">${bd(sc[f.s],f.s)}<div style="display:flex;gap:3px;margin-left:4px">${f.p.map(p=>{const m=team(p);return`<div class="av" style="width:19px;height:19px;font-size:7px;background:${m.c}22;color:${m.c}" title="${m.n}">${p}</div>`;}).join('')}</div>${f.s==='planifiée'?`<button class="btn" style="margin-left:auto;font-size:10px;padding:3px 7px" onclick="toast('Rappel envoyé aux participants')">Rappel</button>`:''}${f.s==='terminée'?`<div style="margin-left:auto;font-size:10px;color:var(--green)">✓ Complétée</div>`:''}</div></div></div>`).join('')}`;}
+
+// ── TÂCHES ────────────────────────────────────────────────────────────
+function pgTaches(){
+  const cols=[{id:'todo',label:'À faire',c:'var(--muted)'},{id:'en-cours',label:'En cours',c:'var(--blue)'},{id:'bloque',label:'Bloqué',c:'var(--red)'},{id:'fait',label:'Fait',c:'var(--green)'}];
+  const pc={haute:'#d95b4a',moyenne:'#d47e2a',basse:'#3a8a5e'};
+  return`
+  <div class="kpi-row k4">${kp('var(--muted)','À faire',TACHES.filter(t=>t.s==='todo').length,null)} ${kp('var(--blue)','En cours',TACHES.filter(t=>t.s==='en-cours').length,null)} ${kp('var(--red)','Bloquées',TACHES.filter(t=>t.s==='bloque').length,null)} ${kp('var(--green)','Terminées',TACHES.filter(t=>t.s==='fait').length,'ce mois')}</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)"><span style="width:8px;height:8px;background:rgba(42,122,114,.3);border-radius:50%;display:inline-block"></span>Synchronisation ClickUp disponible après connexion</div>
+    <button class="btn btn-p" onclick="openTacheModal()">+ Nouvelle tâche</button>
+  </div>
+  <div class="kanban">
+    ${cols.map(col=>{const tasks=TACHES.filter(t=>t.s===col.id);return`<div class="kcol"><div class="kct" style="color:${col.c}">${col.label}<span class="kcc">${tasks.length}</span></div>${tasks.map(t=>{const m=team(t.a);return`<div class="tcard"><div class="tcard-t">${t.titre}</div><div class="tcard-m"><div class="tprio" style="background:${pc[t.p]}" title="${t.p}"></div>${bd('bgr',t.tag)}<span class="tdue">${t.e}</span><div class="av" style="width:17px;height:17px;font-size:7px;background:${m.c}22;color:${m.c};margin-left:auto">${t.a}</div></div></div>`;}).join('')}</div>`;}).join('')}
+  </div>`;}
+function openTacheModal(){
+  document.getElementById('modal-body').innerHTML=`<div class="mh"><div class="mt">Nouvelle tâche</div><button class="mc" onclick="closeModal()">✕</button></div><div class="mb"><div class="field"><label>Titre</label><input type="text" placeholder="Décrivez la tâche..."></div><div class="fr"><div class="field"><label>Assignée à</label><select>${TEAM.map(m=>`<option>${m.n}</option>`).join('')}</select></div><div class="field"><label>Priorité</label><select><option>haute</option><option>moyenne</option><option>basse</option></select></div></div><div class="fr"><div class="field"><label>Catégorie</label><input type="text" placeholder="RH, Fiscal..."></div><div class="field"><label>Échéance</label><input type="date" value="2026-04-30"></div></div><div class="field"><label>Description</label><textarea placeholder="Détails..."></textarea></div></div><div class="mf"><button class="btn" onclick="closeModal()">Annuler</button><button class="btn btn-p" onclick="closeModal();toast('Tâche créée ✓')">Créer</button></div>`;
+  document.getElementById('overlay').classList.add('show');
+}
+
+// ── DOCS ──────────────────────────────────────────────────────────────
+function pgDocs(){
+  const cats=[...new Set(DOCS.map(d=>d.cat))];
+  return`
+  <div class="kpi-row k3">${kp('var(--teal)','Documents actifs',DOCS.length,'dans la bibliothèque')} ${kp('#c9a84c','Mis à jour ce mois','4',null)} ${kp('#3a6ea8','Catégories',cats.length,null)}</div>
+  <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
+    <input type="text" id="doc-s" placeholder="Rechercher un document..." oninput="filterDocs(this.value)" style="flex:1;border:1px solid var(--border);border-radius:7px;padding:7px 11px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--surface2);outline:none">
+    <div style="display:flex;gap:5px">
+      <button class="btn btn-g2" id="dcf-" onclick="filterCat('',this)">Tous</button>
+      ${cats.map(c=>`<button class="btn" id="dcf-${c}" onclick="filterCat('${c}',this)">${c}</button>`).join('')}
+    </div>
+  </div>
+  <div class="dg" id="doc-grid">
+    ${DOCS.map(d=>`<div class="di" data-cat="${d.cat}" data-nom="${d.nom.toLowerCase()}"><div class="di-icon" style="background:rgba(42,122,114,.1)">${d.icon}</div><div class="di-name">${d.nom}</div><div class="di-meta">${d.cat} · Màj ${d.mj} · ${d.sz}</div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">${bd(d.ac==='Admin'?'bgl':'btl',d.ac)}<button class="btn" style="font-size:10px;padding:3px 7px" onclick="toast('Ouverture de '+decodeURIComponent('${encodeURIComponent(d.nom)}'))">Ouvrir</button></div></div>`).join('')}
+  </div>`;}
+function filterDocs(v){document.querySelectorAll('#doc-grid .di').forEach(el=>{el.style.display=el.dataset.nom.includes(v.toLowerCase())?'':'none';});}
+function filterCat(cat,el){document.querySelectorAll('[id^="dcf-"]').forEach(b=>{b.className='btn';if(b.id==='dcf-'+cat)b.className='btn btn-g2';});document.querySelectorAll('#doc-grid .di').forEach(item=>{item.style.display=(!cat||item.dataset.cat===cat)?'':'none';});}
+
+// ── ANNUAIRE ──────────────────────────────────────────────────────────
+function pgAnnuaire(){return`
+  <div class="kpi-row k3">${kp('var(--teal)','Effectif total','3','cabinet PARTEXPERT')} ${kp('#c9a84c','Administrateur','1','Adrien Paris')} ${kp('#3a8a5e','Utilisateurs','2','Bruno & Jade')}</div>
+  <div class="gx3">
+    ${TEAM.map(m=>`<div class="card" style="margin-bottom:0"><div class="cb" style="display:flex;align-items:flex-start;gap:11px"><div class="av" style="width:42px;height:42px;font-size:13px;flex-shrink:0;background:${m.c}22;color:${m.c}">${m.i}</div><div style="flex:1"><div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:2px">${m.n}</div><div style="font-size:11px;color:var(--muted);margin-bottom:5px">${m.r} · ${m.admin?bd('bgl','Administrateur'):bd('btl','Utilisateur')}</div><div style="font-size:11px;color:var(--navy2);margin-bottom:2px">📧 ${m.email}</div><div style="font-size:11px;color:var(--muted)">📞 ${m.tel}</div></div><div style="display:flex;flex-direction:column;gap:4px"><button class="btn" style="font-size:10px;padding:3px 7px" onclick="toast('Email à ${m.n}')">✉</button></div></div></div>`).join('')}
+  </div>`;}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MYUNISOFT API LAYER
+// ═══════════════════════════════════════════════════════════════════════
+const MYU_AUTH_URL = 'https://app.prodcomptable.myunisoft.fr/api/authenticate';
+const MYU_API_URL  = 'https://api.myunisoft.fr/api/v1';
+
+let _myuToken     = null;
+let _myuExpiry    = null;
+let _myuRefreshTm = null;
+let _myuRefreshing = false;
+
+function myuSave(email, password){
+  localStorage.setItem('myu_email', email);
+  localStorage.setItem('myu_password', password);
+}
+function myuLoad(){
+  return {
+    email:    localStorage.getItem('myu_email'),
+    password: localStorage.getItem('myu_password'),
+  };
+}
+function myuIsConfigured(){
+  const c=myuLoad();return !!(c.email&&c.password);
+}
+
+async function myuConnect(email, password){
+  if(_myuRefreshing) return false;
+  _myuRefreshing = true;
+  try {
+    const res = await fetch(MYU_AUTH_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({mail:email, password})
+    });
+    if(!res.ok) throw new Error('Identifiants incorrects ('+res.status+')');
+    const data = await res.json();
+    _myuToken  = data.api_token;
+    // Token valide 4h — on planifie le renouvellement 10 min avant expiration
+    _myuExpiry = Date.now() + (4 * 60 * 60 * 1000);
+    if(_myuRefreshTm) clearTimeout(_myuRefreshTm);
+    _myuRefreshTm = setTimeout(()=>{
+      _myuRefreshing=false;
+      myuRefresh();
+    }, (3 * 60 + 50) * 60 * 1000);
+    myuUpdateStatus(true);
+    return true;
+  } catch(e){
+    myuUpdateStatus(false, e.message);
+    return false;
+  } finally {
+    _myuRefreshing = false;
+  }
+}
+
+async function myuRefresh(){
+  if(_myuRefreshing) return;
+  const c=myuLoad();
+  if(c.email&&c.password) await myuConnect(c.email,c.password);
+}
+
+function myuUpdateStatus(ok, err){
+  const btn=document.getElementById('myu-btn');
+  if(!btn) return;
+  if(ok){
+    btn.style.color='var(--green)';
+    btn.title='MyUnisoft connecté — cliquez pour configurer';
+    btn.textContent='⚙ API ✓';
+    const meta=document.getElementById('pg-meta');
+    if(meta) meta.textContent=_mode==='production'?'Données MyUnisoft en direct':'Avril 2026 · Gestion interne';
+  } else {
+    btn.style.color='var(--red)';
+    btn.title='MyUnisoft non connecté'+(err?' : '+err:'');
+    btn.textContent='⚙ API ✗';
+  }
+}
+
+async function myuGet(endpoint, societyId){
+  if(!_myuToken || Date.now() > _myuExpiry){
+    await myuRefresh();
+    if(!_myuToken) throw new Error('Non connecté');
+  }
+  const headers={'Authorization':'Bearer '+_myuToken,'Content-Type':'application/json'};
+  if(societyId) headers['society-id']=String(societyId);
+  const res=await fetch(MYU_API_URL+endpoint,{headers});
+  if(!res.ok) throw new Error('Erreur API '+res.status);
+  return res.json();
+}
+
+// ── CONFIG MODAL ──────────────────────────────────────────────────────
+function openMYUConfig(){
+  const c=myuLoad();
+  const connected=!!_myuToken&&Date.now()<_myuExpiry;
+  document.getElementById('modal-body').innerHTML=`
+    <div class="mh">
+      <div class="mt">Configuration MyUnisoft</div>
+      <button class="mc" onclick="closeModal()">✕</button>
+    </div>
+    <div class="mb">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+        Saisissez vos identifiants MyUnisoft. Le token est généré automatiquement et renouvelé toutes les 4 heures.
+        <br>Les identifiants sont stockés uniquement dans ce navigateur.
+      </div>
+      ${connected?`<div style="background:rgba(58,138,94,.1);border-left:3px solid var(--green);border-radius:0 7px 7px 0;padding:9px 13px;font-size:12px;color:var(--green);margin-bottom:14px">Connecté — token valide jusqu'à ${new Date(_myuExpiry).toLocaleTimeString('fr-FR')}</div>`:''}
+      <div class="field"><label>Email MyUnisoft</label><input type="email" id="myu-email" value="${c.email||''}" placeholder="adrien@partexpert.fr"></div>
+      <div class="field"><label>Mot de passe MyUnisoft</label><input type="password" id="myu-pass" value="${c.password||''}" placeholder="••••••••"></div>
+      <div id="myu-error" style="display:none;background:rgba(217,91,74,.1);border-left:3px solid var(--red);border-radius:0 7px 7px 0;padding:9px 13px;font-size:12px;color:var(--red);margin-top:10px"></div>
+    </div>
+    <div class="mf">
+      <button class="btn" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-p" onclick="saveMYUConfig()">Se connecter</button>
+    </div>`;
+  document.getElementById('overlay').classList.add('show');
+}
+
+async function saveMYUConfig(){
+  const email=document.getElementById('myu-email').value.trim();
+  const pass=document.getElementById('myu-pass').value;
+  const errEl=document.getElementById('myu-error');
+  if(!email||!pass){errEl.style.display='block';errEl.textContent='Email et mot de passe requis.';return;}
+  const btn=document.querySelector('.mf .btn-p');
+  btn.textContent='Connexion en cours...';btn.disabled=true;
+  const ok=await myuConnect(email, pass);
+  if(ok){
+    myuSave(email,pass);
+    closeModal();
+    toast('✓ MyUnisoft connecté — données en direct activées');
+  } else {
+    errEl.style.display='block';
+    errEl.textContent='Connexion échouée. Vérifiez vos identifiants MyUnisoft.';
+    btn.textContent='Se connecter';btn.disabled=false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════════════════
+checkSession();
+// Auto-connect MyUnisoft si identifiants sauvegardés
+if(myuIsConfigured()){
+  const c=myuLoad();
+  myuConnect(c.email,c.password).then(ok=>{
+    if(ok) toast('✓ MyUnisoft connecté automatiquement');
+  });
+}
+</script>
+</body>
+</html>
